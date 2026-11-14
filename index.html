@@ -1420,16 +1420,22 @@ const F = () => state.ml/BASE_ML;
 
 /* Search: a phrase must sit inside one field (name, brand, flavor, section, program or a single ingredient).
    Only if nothing matches that way do we fall back to "every word appears somewhere". */
-function fieldsOf(v){ if(v._f) return v._f; const nm=x=>{const n=I[x[0]][0];return (Array.isArray(n)?n.join(' '):n).toLowerCase();};
-  return v._f=[v.name,v.brand,v.flavor,STYLE[v.style],KIND[v.kind]||'',v.program].map(x=>x.toLowerCase()).concat([...v.base,...v.mix].map(nm)); }
-let _sq=null,_smode='phrase',_skey='';
+/* normalise: lower case, accents off, "&" -> "and", apostrophes and punctuation dropped */
+const norm=t=>String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/&/g,' and ').replace(/['’‘`]/g,'').replace(/[^a-z0-9Ͱ-Ͽ]+/g,' ').replace(/\s+/g,' ').trim();
+function fieldsOf(v){ if(v._f) return v._f; const nm=x=>{const n=I[x[0]][0];return norm(Array.isArray(n)?n.join(' '):n);};
+  return v._f=[v.name,v.brand,v.flavor,STYLE[v.style],KIND[v.kind]||'',v.program].map(norm).concat([...v.base,...v.mix].map(nm)); }
+/* one typo allowed for words of 5+ letters (chilled ~ chilld) */
+function near(a,b){ if(Math.abs(a.length-b.length)>1) return false; let i=0,j=0,d=0; while(i<a.length&&j<b.length){ if(a[i]===b[j]){i++;j++;continue;} if(++d>1) return false; if(a.length>b.length) i++; else if(b.length>a.length) j++; else {i++;j++;} } return d+(a.length-i)+(b.length-j)<=1; }
+function wordHit(w,tokens,all){ return all.includes(w)||(w.length>=5&&tokens.some(t=>near(w,t))); }
+let _smode='phrase',_skey='';
 function searchOK(r){
-  const q=state.q.replace(/\s+/g,' ').trim(); if(!q) return true;
+  const q=norm(state.q); if(!q) return true;
   const key=q+'|'+state.lean+state.sweet+state.yog;
-  if(key!==_skey){ _skey=key; _sq=q; _smode=R.some(x=>fieldsOf(view(x)).some(f=>f.includes(q)))?'phrase':'words'; }
+  if(key!==_skey){ _skey=key; _smode=R.some(x=>fieldsOf(view(x)).some(f=>f.includes(q)))?'phrase':'words'; }
   const f=fieldsOf(view(r));
   if(_smode==='phrase') return f.some(x=>x.includes(q));
-  const all=f.join(' | '); return q.split(' ').every(w=>all.includes(w));
+  const all=f.join(' | '), tokens=all.split(/[ |]+/);
+  return q.split(' ').every(w=>wordHit(w,tokens,all));
 }
 function filtered(){
   let list=R.filter(r=>(state.kind==='all'||r.kind===state.kind)&&(state.style==='all'||r.style===state.style)&&(state.brand==='all'||r.brand===state.brand)&&(!state.favOnly||favs.has(r.id))&&(!state.noCC||!view(r).cc)&&quickOK(r)&&searchOK(r));
