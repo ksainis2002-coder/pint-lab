@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Pint Lab</title>
+<meta name="theme-color" content="#EDF2F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D131A" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a freezer-shelf index. Sticky filter bar, a grid of pint lids seen from above, recipe opens in a dialog. */
+:root{
+  --bg:#EDF2F5; --surface:#FFFFFF; --surface-2:#E2E9EE; --ink:#13202D; --muted:#566576; --line:#D2DAE1;
+  --accent:#B8174F; --accent-ink:#FFFFFF; --accent-soft:#F8DCE6;
+  --cream:#8A5005; --protein:#0F6956; --dairyfree:#2A68A0; --sorbet:#B8174F;
+  --shadow:0 1px 2px rgba(19,32,45,.06),0 6px 18px rgba(19,32,45,.07);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D131A; --surface:#151F29; --surface-2:#1C2834; --ink:#E5ECF2; --muted:#98A7B6; --line:#283644;
+  --accent:#FF5C93; --accent-ink:#22040F; --accent-soft:#3A1726;
+  --cream:#F0B255; --protein:#4FD1AE; --dairyfree:#7DB6EA; --sorbet:#FF5C93;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D131A; --surface:#151F29; --surface-2:#1C2834; --ink:#E5ECF2; --muted:#98A7B6; --line:#283644;
+  --accent:#FF5C93; --accent-ink:#22040F; --accent-soft:#3A1726;
+  --cream:#F0B255; --protein:#4FD1AE; --dairyfree:#7DB6EA; --sorbet:#FF5C93;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}
+
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{padding-block:28px 18px}
+.brandrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font-size:clamp(34px,6vw,56px);font-weight:800;letter-spacing:-.02em}
+h1 span{color:var(--accent)}
+.lede{color:var(--muted);max-width:60ch;margin:8px 0 0;text-wrap:pretty}
+.lede b{color:var(--ink);font-weight:600}
+.nobind{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.nobind span{font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:1.5px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px}
+.bar .wrap{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search{flex:1 1 220px;min-width:0;position:relative}
+.search input{width:100%;box-sizing:border-box;height:42px;padding:0 12px 0 36px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.search svg{position:absolute;left:11px;top:12px;width:18px;height:18px;color:var(--muted)}
+select,.btn{height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 12px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:6px;transition-property:transform,background-color,border-color;transition-duration:150ms}
+.btn:active{transform:scale(.97)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg{display:flex;gap:4px;padding:3px;background:var(--surface-2);border-radius:11px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg button{flex:none}
+.seg button{border:0;background:transparent;height:34px;padding:0 12px;border-radius:8px;cursor:pointer;font-weight:500;color:var(--muted);transition-property:background-color,color;transition-duration:150ms}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.kinds{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin-bottom:2px}
+.kinds button{flex:none;height:40px;padding:0 12px;border:0;border-bottom:2.5px solid transparent;background:transparent;cursor:pointer;font:600 14.5px/1 var(--f-display);color:var(--muted);white-space:nowrap;transition-property:color,border-color;transition-duration:150ms}
+.kinds button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.kinds button small{font:500 11px var(--f-mono);margin-left:5px}
+.brands{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.brands button{flex:none;height:32px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:13px;white-space:nowrap;transition-property:background-color,color,border-color;transition-duration:150ms}
+.brands button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.brands button small{font-family:var(--f-mono);margin-left:4px;font-size:11px}
+
+main{padding-block:20px 40px}
+.count{color:var(--muted);font-size:13px;margin:0 0 12px;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition-property:transform,box-shadow,border-color;transition-duration:180ms;transition-timing-function:ease-out}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--line),var(--ink) 15%)}
+.card .lid{display:flex;gap:12px;align-items:center}
+.card svg.pint{width:78px;height:78px;flex:none}
+.card .ttl{min-width:0;padding-right:30px}
+.card h3{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.insp{font-size:12.5px;color:var(--muted);margin-top:3px;text-wrap:pretty}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px;border-radius:6px;border:1px solid currentColor}
+.chip.full{color:var(--cream)} .chip.protein{color:var(--protein)} .chip.dairyfree{color:var(--dairyfree)} .chip.sorbet{color:var(--sorbet)}
+.chip.prog{color:var(--muted);border-color:var(--line)}
+.chip.lean{color:var(--protein);background:color-mix(in srgb,var(--protein) 12%,transparent)}
+.leantag{font:600 13px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--protein);border:1px solid currentColor;border-radius:6px;padding:4px 7px;vertical-align:middle}
+.tub{display:flex;align-items:center;gap:6px;height:40px;padding:0 6px 0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px}
+.tub label{color:var(--muted)}
+.tub input{width:64px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:0 6px;font-family:var(--f-mono);font-size:13px}
+.tub span{color:var(--muted)}
+.tub select{height:30px;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:0 6px;font-size:13px}
+.tub button{height:30px;padding:0 8px;border:0;border-radius:7px;background:transparent;font-family:var(--f-mono);font-size:12px;color:var(--muted);cursor:pointer}
+.tub button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink)}
+#leanBtn[aria-pressed="true"]{background:var(--protein);border-color:var(--protein);color:var(--surface)}
+.macros{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums;border-top:1px dashed var(--line);padding-top:9px;color:var(--muted)}
+.macros b{color:var(--ink);font-weight:500}
+.ings{font-size:13px;color:var(--muted);text-wrap:pretty;margin:0}
+.fav{position:absolute;top:8px;right:8px;width:40px;height:40px;border:0;background:transparent;border-radius:10px;cursor:pointer;color:var(--muted);display:grid;place-items:center}
+.fav[aria-pressed="true"]{color:var(--accent)}
+.fav svg{width:20px;height:20px}
+.empty{padding:48px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}
+.empty button{margin-top:12px}
+
+.science{margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.science h2{grid-column:1/-1;font-size:28px;font-weight:800}
+.science .lever{background:var(--surface-2);border-radius:14px;padding:16px}
+.science h3{font-size:17px;font-weight:600;margin-bottom:6px}
+.science p{margin:0;color:var(--muted);font-size:14px;text-wrap:pretty}
+.foot{color:var(--muted);font-size:12.5px;margin-top:28px;border-top:1px solid var(--line);padding-top:14px;text-wrap:pretty}
+
+dialog{border:0;padding:0;border-radius:20px;background:var(--surface);color:var(--ink);width:min(760px,calc(100vw - 24px));max-height:calc(100dvh - 32px);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(8,14,20,.55)}
+dialog[open]{animation:pop .2s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+.dhead{display:flex;gap:18px;align-items:center;padding:22px 22px 16px;background:var(--surface-2);position:relative}
+.dhead svg.pint{width:120px;height:120px;flex:none}
+.dhead h2{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.02em}
+.dhead .ttl{min-width:0;padding-right:36px}
+.close{position:absolute;top:10px;right:10px;width:40px;height:40px;border:0;border-radius:10px;background:transparent;cursor:pointer;color:var(--ink);font-size:22px}
+.dbody{padding:18px 22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.dbody > *{min-width:0}
+.dbody h3{font:600 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.ilist{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column}
+.ilist li{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.ilist .q{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--accent);padding-top:1px}
+.ilist .n small{color:var(--muted)}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:12px}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:26px 1fr;gap:10px;font-size:14.5px;text-wrap:pretty}
+ol.steps li::before{content:counter(s);width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--bg);font:600 12px/24px var(--f-mono);text-align:center}
+.tip{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--accent-soft);font-size:14px;text-wrap:pretty}
+.tip b{color:var(--accent)}
+.sizebar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+table.nut{width:100%;border-collapse:collapse;font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;margin-bottom:6px}
+table.nut th,table.nut td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.nut th:first-child,table.nut td:first-child{text-align:left;font-family:var(--f-body);color:var(--muted);font-weight:500}
+table.nut th{font-weight:500;color:var(--muted);font-family:var(--f-body);font-size:12px}
+.note{font-size:12px;color:var(--muted);margin:0}
+.dactions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+
+@media (max-width:640px){
+  .dbody{grid-template-columns:1fr}
+  .dhead{flex-direction:column;align-items:flex-start;gap:10px}
+  .dhead svg.pint{width:84px;height:84px}
+}
+
+/* ---- compact bar, sheet, cooking mode ---- */
+.brandrow{align-items:center}
+.btn.ghost{background:transparent}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.mono{font-family:var(--f-mono)}
+.toprow{flex-wrap:nowrap}
+.toprow .search{flex:1 1 auto}
+.iconbtn{position:relative;padding:0 11px}
+.badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:600 11px/18px var(--f-mono);text-align:center;padding:0 4px;box-sizing:border-box}
+.countrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.countrow .count{margin:0}
+.linkbtn{border:0;background:transparent;color:var(--accent);font-size:13px;cursor:pointer;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.chip.freeze{color:var(--dairyfree)}
+.chip.ready{color:var(--protein);background:color-mix(in srgb,var(--protein) 12%,transparent)}
+dialog.sheet{width:min(520px,calc(100vw - 24px));padding:0;border:0;border-radius:20px;background:var(--surface);color:var(--ink);max-height:calc(100dvh - 32px);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog.sheet[open]{display:flex;flex-direction:column}
+dialog.sheet::backdrop,dialog.cook::backdrop{background:rgba(8,14,20,.55)}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 8px;position:relative}
+.sheet-head h2{font-size:22px;font-weight:800}
+.sheet-head .close{position:static}
+.sheet-body{padding:4px 18px 12px;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.sheet-body h3{font:600 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.sheet-body select{width:100%}
+.sheet-body .tub{height:auto;flex-wrap:wrap;padding:8px 10px;gap:8px}
+.sheet-body .tub input{width:80px;height:36px}
+.sheet-body .tub button{height:36px;border:1px solid var(--line)}
+.field{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.field select{width:auto;height:38px}
+.switch{width:48px;height:28px;border-radius:14px;border:0;background:var(--surface-2);position:relative;cursor:pointer;flex:none;transition-property:background-color;transition-duration:150ms}
+.switch i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition-property:transform;transition-duration:150ms}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"] i{transform:translateX(20px)}
+.sheet-foot{display:flex;gap:10px;justify-content:space-between;padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.sheet-foot .primary{flex:1}
+.dtools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+dialog.cook{margin:0;padding:0;border:0;width:100vw;height:100dvh;max-width:100vw;max-height:100dvh;background:var(--bg);color:var(--ink)}
+dialog.cook[open]{display:flex;flex-direction:column}
+.ck-head{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);background:var(--surface)}
+.ck-head .t{min-width:0;flex:1}
+.ck-head h2{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ck-head .sub{font-size:12.5px;color:var(--muted)}
+.ck-head .close{position:static}
+.ck-prog{height:4px;background:var(--surface-2)}
+.ck-prog i{display:block;height:100%;background:var(--accent);transition-property:width;transition-duration:250ms}
+.ck-body{flex:1;overflow:auto;padding:22px max(16px,env(safe-area-inset-right,0px)) 22px max(16px,env(safe-area-inset-left,0px))}
+.ck-inner{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.ck-step{font-family:var(--f-display);font-size:clamp(22px,5.4vw,30px);line-height:1.3;font-weight:600;text-wrap:pretty;margin:0}
+.ck-label{font:600 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.ck-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ck-list button{width:100%;display:grid;grid-template-columns:28px 84px 1fr;gap:10px;align-items:center;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;font-size:16px;min-height:52px}
+.ck-list .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;color:var(--accent-ink)}
+.ck-list button[aria-checked="true"]{opacity:.55}
+.ck-list button[aria-checked="true"] .box{background:var(--accent);border-color:var(--accent)}
+.ck-list button[aria-checked="true"] .nm{text-decoration:line-through}
+.ck-list .q{font-family:var(--f-mono);font-size:14px;color:var(--accent)}
+.ck-list small{color:var(--muted)}
+.ck-sub{font:600 13px/1 var(--f-body);color:var(--muted);margin:8px 0 0}
+.ck-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ck-timer{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.ck-timer b{font:500 34px/1 var(--f-mono);font-variant-numeric:tabular-nums}
+.ck-timer.done{border-color:var(--protein);color:var(--protein)}
+.ck-foot{display:flex;gap:10px;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);background:var(--surface)}
+.ck-foot .btn{flex:1;height:52px;justify-content:center;font-size:16px}
+.ck-chip{font:500 13px var(--f-mono);padding:6px 10px;border-radius:8px;background:var(--accent-soft);color:var(--accent);border:0;cursor:pointer}
+@media (max-width:640px){
+  .lbl{display:none}
+  dialog.sheet{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:88dvh}
+  #leanBtn{padding:0 10px}
+}
+
+/* ---- round 2: shelf, groups, quick filters, macro bar, log ---- */
+.ghead{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;margin-top:14px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.ghead:first-child{margin-top:0}
+.ghead h2{font-size:20px;font-weight:800}
+.ghead span{font:500 12px var(--f-mono);color:var(--muted)}
+.shelf{margin-bottom:16px;padding:12px 14px;border-radius:16px;background:var(--surface-2)}
+.shelf h2{font:600 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.shelf-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:2px}
+.tubcard{flex:none;display:flex;align-items:center;gap:10px;padding:8px 6px 8px 8px;border-radius:12px;background:var(--surface);border:1px solid var(--line);min-width:0}
+.tubcard .open{display:flex;align-items:center;gap:10px;border:0;background:transparent;cursor:pointer;text-align:left;padding:0;min-height:44px}
+.tubcard svg.pint{width:40px;height:40px;flex:none}
+.tubcard b{display:block;font:600 14px/1.2 var(--f-display);white-space:nowrap}
+.tubcard small{font:500 12px var(--f-mono);color:var(--dairyfree)}
+.tubcard.ready small{color:var(--protein)}
+.tubcard .x{width:36px;height:36px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;border-radius:8px}
+.qchips{display:flex;flex-wrap:wrap;gap:6px}
+.qchips button{height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:13.5px}
+.qchips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.active{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px}
+.active button{height:30px;padding:0 10px;border-radius:99px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:12.5px;color:var(--ink)}
+.active button::after{content:" ×";color:var(--muted)}
+.split{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:2px 0 6px;background:var(--surface-2)}
+.split i{display:block}
+.split .p{background:var(--protein)} .split .f{background:var(--cream)} .split .c{background:var(--dairyfree)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.saves{font-size:13.5px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--protein) 12%,transparent);color:var(--ink);margin:0 0 10px}
+.saves b{color:var(--protein)}
+.log{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.log textarea{width:100%;box-sizing:border-box;min-height:64px;margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+.chip.made{color:var(--muted);border-color:var(--line)}
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;font-size:18px;z-index:4}
+.card .macros{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:auto;font-size:11.5px}
+.card .macros span{display:flex;flex-direction:column;gap:1px}
+.card .macros b{font-size:14px}
+
+.card .open{all:unset;cursor:pointer}
+.card .open::after{content:"";position:absolute;inset:0;border-radius:16px}
+.card .open:focus-visible::after{outline:2px solid var(--accent);outline-offset:2px}
+.card .fav{z-index:1}
+.dbody h3,.sheet-body h3{font-family:var(--f-body)}
+table.nut td:first-child{border-bottom:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brandrow">
+    <h1>Pint<span>Lab</span></h1>
+    <button class="btn ghost" id="surprise" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg> Surprise me</button>
+  </div>
+  <p class="lede"><b id="total">160</b> gum-free recipes for your Johnson Velvet Creme, copied from the brands you buy. Every one has a lean version and full macros.</p>
+</div></header>
+
+<nav class="bar" aria-label="Find recipes"><div class="wrap">
+  <div class="row toprow">
+    <label class="search" for="q"><span hidden>Search</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search flavors, brands, ingredients" autocomplete="off">
+    </label>
+    <button class="btn" id="leanBtn" type="button" aria-pressed="false" title="Show the low-fat version of every recipe">Lean</button>
+    <button class="btn iconbtn" id="setupBtn" type="button" aria-haspopup="dialog" aria-label="Setup and filters"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span class="lbl">Setup</span><span class="badge" id="setupBadge" hidden></span></button>
+    <button class="btn iconbtn" id="favBtn" type="button" aria-pressed="false" aria-label="Saved recipes"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4h2c.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg><span id="favCount" class="mono">0</span></button>
+  </div>
+  <div class="kinds" id="kinds" role="group" aria-label="Section"></div>
+  <div class="brands" id="brands" role="group" aria-label="Brand"></div>
+</div></nav>
+
+<dialog id="setup" class="sheet" aria-labelledby="setupTitle">
+  <div class="sheet-head"><h2 id="setupTitle">Setup &amp; filters</h2><button class="close" type="button" data-closesheet aria-label="Close">×</button></div>
+  <div class="sheet-body">
+    <section><h3>Style</h3><div class="seg" id="styles" role="group" aria-label="Style"></div></section>
+    <section><h3><label for="sort">Sort by</label></h3>
+      <select id="sort">
+        <option value="brand">Brand</option>
+        <option value="az">A to Z</option>
+        <option value="protein">Most protein</option>
+        <option value="kcal">Fewest calories</option>
+        <option value="sugar">Least sugar</option>
+        <option value="fat">Least fat</option>
+        <option value="few">Fewest ingredients</option>
+      </select></section>
+    <section><h3><label for="ml">My tub</label></h3>
+      <div class="tub"><input id="ml" type="number" inputmode="numeric" min="150" max="2000" step="10" value="450"><span>ml</span>
+        <button type="button" data-ml="450">450 Johnson</button><button type="button" data-ml="473">473 Creami</button><button type="button" data-ml="709">709 Deluxe</button></div></section>
+    <section><h3>Macros per tub</h3><div class="qchips" id="quick" role="group" aria-label="Macro filters"></div></section>
+    <section><h3>Pantry</h3>
+      <div class="field"><label for="sweet">Sweetener</label><select id="sweet"><option value="allulose">Allulose</option><option value="stevia">Stevia drops</option></select></div>
+      <div class="field"><label for="yog">Thick yogurt</label><select id="yog"><option value="skyr">Skyr / quark</option><option value="greek">Strained Greek yogurt</option></select></div>
+      <div class="field"><span>Hide recipes with cream cheese</span><button class="switch" id="ccBtn" type="button" role="switch" aria-checked="false" aria-label="Hide recipes with cream cheese"><i></i></button></div>
+    </section>
+  </div>
+  <div class="sheet-foot"><button class="btn" type="button" id="resetSetup">Reset filters</button><button class="btn primary" type="button" data-closesheet id="showN">Show recipes</button></div>
+</dialog>
+
+<dialog id="cook" class="cook" aria-label="Cooking mode"></dialog>
+
+<main class="wrap">
+  <div class="countrow"><p class="count" id="count" aria-live="polite"></p><button class="linkbtn" type="button" id="setupSummary"></button></div>
+  <div class="active" id="active" hidden></div>
+  <section class="shelf" id="shelf" hidden aria-label="In your freezer"></section>
+  <div class="grid" id="grid"></div>
+  <button class="totop" id="totop" type="button" aria-label="Back to top" hidden>↑</button>
+
+  <section class="science" aria-labelledby="sci">
+    <h2 id="sci">How it stays creamy without binders</h2>
+    <div class="nobind" aria-label="Left out of every base" style="grid-column:1/-1;margin-top:-4px"><span>Xanthan gum</span><span>Guar gum</span><span>Pudding mix</span><span>Gelatin</span><span>Cornstarch</span></div>
+    <div class="lever"><h3>Sugar</h3><p>Dissolved sugar lowers the freezing point, so part of the pint stays soft. Full-cream bases here keep 60 to 80 g. Cut it and the pint spins up crumbly. In protein pints, allulose softens much like sugar; erythritol freezes harder and can turn gritty.</p></div>
+    <div class="lever"><h3>Fat</h3><p>Cream coats ice crystals and keeps them small. The richest copies use close to a 1:1 milk to cream ratio, which is what the store pints do with eggs and gums.</p></div>
+    <div class="lever"><h3>Protein</h3><p>Skyr, Greek yogurt, ultra-filtered milk and protein powder add body to lighter pints. They spin up powdery the first time, which is normal: a splash of milk and a re-spin fixes it.</p></div>
+    <div class="lever"><h3>Technique</h3><p>Freeze for a full 24 hours on a level shelf. Let the pint sit 5 minutes (10 for protein), spin, then re-spin with 1 tbsp of liquid if it looks dry. Leftovers: smooth the top flat, refreeze, and re-spin before eating.</p></div>
+    <div class="lever"><h3>Your tub size</h3><p>The app starts at 450 ml, the Johnson Velvet Creme tub. 473 is the Ninja Creami pint and 709 the Creami Deluxe. Every recipe scales to the number you enter. Not sure of yours? Fill the tub with water up to the max fill line and pour it into a measuring jug. Program names match the Johnson Velvet Creme: Ice Cream, Light Ice Cream, Gelato, Sorbet, Italian Ice, Milk Shake, Frozen Yogurt, Slushie and Frozen Drink. On a Ninja Creami, Light Ice Cream is called Lite Ice Cream.</p></div>
+    <div class="lever"><h3>Lean versions</h3><p>For a cut, each full-cream recipe gets a lean twin: cream swaps to ultra-filtered milk and skyr, sugar to allulose, sauces to sugar-free, peanut butter to powdered, and the richest mix-ins are halved. Most land at 350 to 600 kcal and under 20 g fat per tub with 40 g+ protein.</p></div>
+    <div class="lever"><h3>Slushies and Italian ice</h3><p>These are fat-free already, so their lean version is the same recipe. They need sugar to work: about 20 g per tub at least. Zero-sugar drinks and stevia freeze into a solid block that won't slush. Fizzy drinks: let the bubbles settle before freezing.</p></div>
+    <div class="lever"><h3>Swaps that work</h3><p>Stevia drops can replace allulose: about 5 drops per tablespoon, but it does nothing for texture, so the tub freezes firmer and needs an extra re-spin. Greek yogurt can replace skyr or quark gram for gram. Use a thick, strained Greek style; regular runny yogurt has more water and less protein and turns icy.</p></div>
+    <div class="lever"><h3>Cream cheese, the one binder</h3><p>One tablespoon of light cream cheese in a protein pint makes it smoother on the first spin and cuts down re-spins. The cheesecake flavours use 60 to 100 g as the main body. Soften it and blend it with the sugar first so it leaves no flecks. Use the Hide cream cheese button if you want pints without it.</p></div>
+    <div class="lever"><h3>Read one label</h3><p>Many protein powders contain gums. For a fully binder-free protein pint, pick one whose label lists only protein, flavoring and sweetener. Store-bought mix-ins like cookies and candy are fine; it's the base that matters.</p></div>
+  </section>
+
+  <p class="foot">Home recipes inspired by store-bought flavors. Pint Lab isn't affiliated with or endorsed by any brand named here; brand and flavor names belong to their owners. Nutrition is estimated from typical ingredient values and will vary with the products you use.</p>
+</main>
+
+<dialog id="dlg" aria-labelledby="dTitle"></dialog>
+
+<script>
+/* ---------- Ingredient table: [name (or [singular, plural]), unit, grams per unit, kcal, protein, fat, carbs per 100 g, mix-in colour] ---------- */
+const I = {
+  milk:['whole milk','ml',1.03,61,3.2,3.3,4.8],
+  milk15:['semi-skimmed milk (1.5%)','ml',1.03,46,3.4,1.5,4.8],
+  ufmilk:['ultra-filtered milk (Fairlife-style 2%)','ml',1.03,50,5.4,1.9,2.5],
+  cream:['heavy cream','ml',1.0,340,2.8,36,2.8],
+  greek:['strained Greek yogurt (στραγγιστό), 0%','g',1,59,10.3,0.4,3.6],
+  greek5:['strained Greek yogurt (στραγγιστό), full fat','g',1,97,9,5,4],
+  skyr:['skyr or quark, plain','g',1,63,11,0.2,4],
+  cc:['full-fat cream cheese, softened','tbsp',14.5,342,6,34,4],
+  lccg:['light cream cheese, softened','g',1,200,8,15,7],
+  lcoco:['light coconut milk (canned)','ml',1,73,0.7,7,1.5],
+  sfchoc:['sugar-free chocolate syrup','tbsp',15,35,1,0,8,'#3B2118'],
+  lcc:['light cream cheese, softened','tbsp',15,200,8,15,7],
+  ccg:['full-fat cream cheese, softened','g',1,342,6,34,4],
+  wheyV:['vanilla protein powder','scoop',30,390,75,5,12],
+  wheyC:['chocolate protein powder','scoop',30,375,70,6,14],
+  sugar:['granulated sugar','g',1,400,0,0,100],
+  brown:['light brown sugar','g',1,380,0.1,0,98],
+  honey:['honey','tbsp',21,304,0.3,0,82],
+  allulose:['allulose','tbsp',12,20,0,0,0],
+  stevia:['liquid stevia','drop',0.04,0,0,0,0],
+  cocoa:['unsweetened cocoa powder','tbsp',5.4,228,20,14,58],
+  vanilla:['vanilla extract','tsp',4.2,288,0,0,13],
+  salt:['salt','pinch',0.4,0,0,0,0],
+  espresso:['instant espresso powder','tsp',1.8,240,12,0.5,41],
+  mint:['peppermint extract','tsp',4,0,0,0,0],
+  malt:['malted milk powder','tbsp',7.5,380,9,7,76],
+  pb:['smooth peanut butter','tbsp',16,588,25,50,20,'#B9824A'],
+  pb2:['powdered peanut butter','tbsp',6,417,50,12.5,42],
+  biscoff:['Biscoff cookie spread','tbsp',16,584,4.9,38,57],
+  nutella:['hazelnut cocoa spread','tbsp',19,539,6.3,31,58],
+  dulce:['dulce de leche','tbsp',20,315,6.8,7.4,55,'#B47A3C'],
+  caramel:['caramel sauce','tbsp',20,380,1.5,9,75,'#C48433'],
+  sfcaramel:['sugar-free caramel syrup','tbsp',15,0,0,0,0,'#C48433'],
+  fudge:['hot fudge sauce','tbsp',20,350,4,10,60,'#3B2118'],
+  fluff:['marshmallow creme','tbsp',6.5,312,0.8,0.3,78,'#FBF8F2'],
+  jam:['berry jam','tbsp',20,250,0.4,0.1,62,'#6E1838'],
+  banana:[['ripe banana','ripe bananas'],'',118,89,1.1,0.3,23],
+  straw:['strawberries','g',1,32,0.7,0.3,7.7,'#D8344F'],
+  rasp:['raspberries','g',1,52,1.2,0.7,12],
+  blue:['blueberries','g',1,57,0.7,0.3,14.5,'#3B3F8C'],
+  cherry:['dark sweet cherries, pitted','g',1,63,1.1,0.2,16,'#5E0F22'],
+  mango:['ripe mango','g',1,60,0.8,0.4,15],
+  pine:['pineapple chunks, with a little juice','g',1,50,0.5,0.1,13],
+  lemon:['lemon juice','tbsp',15,22,0.4,0.2,7],
+  lime:['lime juice','tbsp',15,25,0.4,0.1,8],
+  water:['cold water','ml',1,0,0,0,0],
+  loukoumas:[['loukouma','loukoumades'],'',12,340,6,16,44,'#C98A3E'],
+  tahini:['tahini','tbsp',15,595,17,54,21],
+  halva:['tahini halva','g',1,516,12,28,58,'#D8C3A0'],
+  kataifi:['kataifi pastry','g',1,360,8,10,60,'#E2B871'],
+  tsoureki:['tsoureki','g',1,360,8,12,55,'#E8C27A'],
+  melomakarono:[['melomakarono','melomakarona'],'',30,430,4,20,58,'#8A4F22'],
+  kourabies:[['kourabies','kourabiedes'],'',25,540,7,33,54,'#F6F1E6'],
+  mahlab:['mahlepi (mahlab), ground','tsp',2,0,0,0,0],
+  rosewater:['rose water','tsp',5,0,0,0,0],
+  clove:['ground cloves','tsp',2,0,0,0,0],
+  orangezest:['orange zest','tsp',2,0,0,0,0],
+  vanilia:['vanilia spoon sweet (βανίλια υποβρύχιο)','tbsp',20,390,0,0,97,'#FFFFFF'],
+  rice:['cooked rizogalo rice','g',1,130,2.7,0.3,28,'#F7F3EA'],
+  sesame:['toasted sesame seeds','g',1,573,18,50,23],
+  pasteli:['pasteli (sesame honey bar)','g',1,520,13,30,50,'#C9A060'],
+  figs:['dried figs','g',1,249,3.3,0.9,64,'#7A4A55'],
+  petitbeurre:[['petit-beurre biscuit','petit-beurre biscuits'],'',8,440,7.5,11,76,'#E4BE7A'],
+  revani:['revani (syrup cake)','g',1,330,5,10,55,'#E8B850'],
+  karidopita:['karidopita (walnut cake)','g',1,400,6,18,52,'#8C5A33'],
+  sponge:['cocoa sponge cake','g',1,380,6,15,55,'#4A2C20'],
+  choux:['profiterole choux shells','g',1,360,9,26,22,'#D9A55E'],
+  coconut:['toasted coconut flakes','g',1,660,6.9,65,24,'#F1E6CF'],
+  blondie:['blondie','g',1,430,5,20,58,'#D9A85E'],
+  crisps:['salted potato chips','g',1,536,7,35,53,'#E8C25A'],
+  pumpkin:['pumpkin purée','g',1,34,1,0.3,8],
+  oatcookie:[['oatmeal cookie','oatmeal cookies'],'',15,450,6,18,68,'#B98A55'],
+  cookie:[['chocolate chip cookie','chocolate chip cookies'],'',16,490,5,24,64,'#B9844E'],
+  milkchoc:['milk chocolate, chopped','g',1,535,7.7,30,59,'#7B4A2D'],
+  caprice:['Caprice-style wafer rolls','g',1,500,6,25,62,'#C99A5E'],
+  diples:['diples, broken','g',1,470,7,22,60,'#E3B568'],
+  sokolatopita:['sokolatopita (chocolate syrup cake)','g',1,390,5,17,56,'#3E2218'],
+  petimezi:['petimezi (grape molasses)','tbsp',20,290,0.4,0,72,'#4A1E22'],
+  loukoumi:['loukoumi (Syros), diced','g',1,360,0,0,90,'#F2C6D2'],
+  lemonade:['Greek lemonade soda (regular)','ml',1.04,40,0,0,10],
+  kumquat:['kumquats (Corfu), sliced and seeded','g',1,71,1.9,0.9,16],
+  mountaintea:['mountain tea (τσάι του βουνού), brewed and cooled','ml',1,1,0,0,0],
+  mascarpone:['mascarpone','g',1,429,4.6,44,3.5],
+  savoiardi:[['ladyfinger','ladyfingers'],'',8,390,8,4,80,'#E7C489'],
+  espressoml:['brewed espresso or strong coffee','ml',1,2,0.1,0.2,0],
+  cola:['cola','ml',1.04,42,0,0,10.6],
+  orangesoda:['orange soda (regular)','ml',1.04,40,0,0,9.8],
+  lemonlime:['lemon-lime soda (regular)','ml',1.04,37,0,0,9],
+  icetea:['peach ice tea (bottled, regular)','ml',1.02,19,0,0,4.6],
+  watermelon:['watermelon','g',1,30,0.6,0.2,7.6],
+  pinej:['pineapple juice','ml',1.04,53,0.4,0.1,13],
+  cococream:['coconut cream','g',1,330,3.6,34.7,6.6],
+  greek2:['strained Greek yogurt (στραγγιστό), 2%','g',1,73,9.5,2,4],
+  condensed:['sweetened condensed milk','g',1,321,7.9,8.7,54],
+  chocmilk:['chocolate milk (Milko-style)','ml',1.03,72,3.4,1.5,11],
+  oj:['orange juice','ml',1.04,45,0.7,0.2,10.4],
+  lemonml:['fresh lemon juice','ml',1,22,0.4,0.2,7],
+  zest:['lemon zest','tsp',2,0,0,0,0],
+  passion:['passion fruit pulp','g',1,97,2.2,0.7,23],
+  hazelnut:['toasted hazelnuts','g',1,628,15,61,17,'#8A5A2B'],
+  white:['white chocolate','g',1,539,6,32,59,'#F7EEDC'],
+  wafer:['chocolate wafers','g',1,520,6,28,60,'#6B4026'],
+  vyssino:['sour cherry spoon sweet (βύσσινο)','tbsp',20,280,0.3,0,70,'#6A0F25'],
+  peach:['peaches','g',1,39,0.9,0.3,10],
+  mastic:['mastic (mastiha) tears','tsp',2,0,0,0,0],
+  cinnamon:['ground cinnamon','tsp',2.6,0,0,0,0],
+  instcoffee:['instant coffee','tsp',2,0,0,0,0],
+  cocooil:['coconut oil','tsp',4.5,862,0,100,0],
+  phyllo:[['phyllo sheet','phyllo sheets'],'',19,300,7,6,52,'#E2B871'],
+  cocomilk:['full-fat coconut milk (canned)','ml',1,197,2.2,21,2.8],
+  oat:['oat milk (barista)','ml',1.03,59,1,3,6.6],
+  almondm:['unsweetened almond milk','ml',1,15,0.6,1.2,0.3],
+  lavender:['dried culinary lavender','tsp',1,0,0,0,0],
+  spinach:['baby spinach (for colour, no taste)','g',1,23,2.9,0.4,3.6],
+  cereal:['cornflakes','g',1,357,7.5,0.4,84,'#E3B85E'],
+  butter:['unsalted butter','g',1,717,0.9,81,0.1],
+  oats:['rolled oats','g',1,380,13,6.5,68,'#C9A46C'],
+  oreo:[['chocolate sandwich cookie','chocolate sandwich cookies'],'',11.3,470,4.8,20,69,'#1E1715'],
+  chips:['semisweet chocolate chips','g',1,480,4.2,30,64,'#3A221A'],
+  minichips:['mini chocolate chips','g',1,480,4.2,30,64,'#3A221A'],
+  dark:['dark chocolate (70%), chopped','g',1,600,7.8,43,46,'#2B1711'],
+  dough:['edible cookie dough bites','g',1,450,4,20,63,'#D6B17C'],
+  brownie:['brownie, cut in 1 cm cubes','g',1,420,5,18,60,'#3E2419'],
+  graham:[['graham cracker sheet','graham cracker sheets'],'',14,430,6.7,10,77,'#C88E4E'],
+  pretzel:['mini pretzels','g',1,380,10,3,80,'#9A5A25'],
+  toffee:['toffee bits','g',1,530,2,30,64,'#C27A2C'],
+  almond:['toasted almonds, chopped','g',1,580,21,50,22,'#C49A6C'],
+  pecan:['toasted pecans, chopped','g',1,690,9,72,14,'#7A4524'],
+  walnut:['walnuts, chopped','g',1,654,15,65,14,'#A8794D'],
+  pistachio:['shelled pistachios','g',1,560,20,45,28,'#7F9A3A'],
+  lotus:[['Biscoff cookie','Biscoff cookies'],'',6.25,484,5,19,72,'#B26D33'],
+  pbcup:[['mini peanut butter cup','mini peanut butter cups'],'',9,515,10,30,55,'#5B3420'],
+  bueno:[['Kinder Bueno bar (2 fingers)','Kinder Bueno bars (2 fingers each)'],'',43,572,8.6,37,50,'#8B5A35'],
+  candy:['candy-coated chocolates (M&M or Smarties)','g',1,490,4.5,21,70,'multi'],
+  sprinkles:['rainbow sprinkles','tbsp',12,450,0,15,80,'multi'],
+  cake:['vanilla cake, crumbled','g',1,370,4.5,15,55,'#F2D9A0'],
+  cone:['waffle cone, broken up','g',1,400,7,5,82,'#C8873F'],
+  beans:['chocolate-covered espresso beans','g',1,500,6,28,60,'#2A1610'],
+  crunchbar:['peanut butter crunch candy bar, chopped','g',1,460,5,18,70,'#E19A2C'],
+};
+
+/* ---------- Recipes ---------- */
+const SW = (sug=70) => [['milk',220],['cream',170],['sugar',sug],['vanilla',1],['salt',1]];
+const CHOC = (cocoa=3) => [['milk',260],['cream',140],['sugar',80],['cocoa',cocoa],['vanilla',1],['salt',1]];
+const BLOOM = 'Warm 60 ml of the milk until steaming and whisk the cocoa into it to a smooth paste, so it dissolves without lumps. Then add the rest of the base.';
+const LITE = (extra=[]) => [['ufmilk',300],['skyr',110],['lcc',1],['wheyV',1],['allulose',3],['vanilla',1.5],...extra];
+const FLURRY = [['milk15',200],['skyr',140],['lcc',1],['wheyV',1],['allulose',2],['vanilla',1]];
+
+const R = [
+ /* Ben & Jerry's */
+ {id:'cherry-fudge-flake',name:'Cherry Fudge Flake',brand:"Ben & Jerry's",flavor:'Cherry Garcia',style:'full',program:'Ice Cream',color:'#F1D3DA',
+  base:SW(65),mix:[['cherry',80,'halved, thawed and patted dry'],['dark',30,'shaved thin']],
+  tip:'Shave the chocolate with a vegetable peeler so the flakes stay tender when frozen. Pat the cherries dry or their juice turns icy.'},
+ {id:'cookie-dough-classic',name:'Cookie Dough Classic',brand:"Ben & Jerry's",flavor:'Chocolate Chip Cookie Dough',style:'full',program:'Ice Cream',color:'#F2E5C8',
+  base:[['milk',220],['cream',170],['sugar',40],['brown',30],['vanilla',1.5],['salt',1]],mix:[['dough',70,'in 1 cm pieces'],['minichips',20]],
+  tip:'Brown sugar in the base gives the faint butterscotch note that makes it taste like cookie dough before you add any dough.'},
+ {id:'fudge-brownie',name:'Fudge Brownie',brand:"Ben & Jerry's",flavor:'Chocolate Fudge Brownie',style:'full',program:'Ice Cream',color:'#5E3A2A',
+  base:CHOC(3),mix:[['brownie',70,'fudgy, frozen 20 min first']],prep:[BLOOM],
+  tip:'Freeze the brownie cubes for 20 minutes before mixing in so they stay in chunks instead of smearing.'},
+ {id:'half-and-half-baked',name:'Half & Half Baked',brand:"Ben & Jerry's",flavor:'Half Baked',style:'full',program:'Ice Cream',color:'#6E4632',
+  base:CHOC(2.5),mix:[['dough',45],['brownie',45]],prep:[BLOOM],
+  tip:'For the two-tone look, spin a vanilla pint (Cookie Dough Classic base) and this one, then layer spoonfuls of both into one pint before adding the mix-ins.'},
+ {id:'marshmallow-fudge-swim',name:'Marshmallow Fudge Swim',brand:"Ben & Jerry's",flavor:'Phish Food',style:'full',program:'Ice Cream',color:'#573526',
+  base:CHOC(2.5),mix:[['fluff',2,'swirl'],['caramel',1.5,'swirl'],['dark',30,'in small chunks']],prep:[BLOOM],swirl:true,
+  tip:'Add the chocolate first, then spoon the marshmallow and caramel in last and only run MIX-IN once, so they stay as ribbons.'},
+ {id:'banana-walnut-fudge',name:'Banana Walnut Fudge',brand:"Ben & Jerry's",flavor:'Chunky Monkey',style:'full',program:'Ice Cream',color:'#EDDCA0',
+  base:[['banana',1,'very ripe, spotty'],['milk',200],['cream',140],['sugar',45],['vanilla',1],['salt',1]],mix:[['walnut',30,'toasted'],['dark',30,'chopped']],
+  tip:'Banana pectin and fibre give this base natural body, so it is one of the creamiest pints here on the first spin.'},
+ {id:'caramel-cone-dream',name:'Caramel Cone Dream',brand:"Ben & Jerry's",flavor:'Americone Dream',style:'full',program:'Ice Cream',color:'#F0E1C0',
+  base:SW(65),mix:[['cone',30],['dark',15,'melted'],['caramel',2,'swirl']],swirl:true,
+  tip:'Toss the cone pieces in the melted chocolate and chill them 10 minutes. The chocolate coating keeps them crunchy in the freezer.'},
+ {id:'peanut-butter-cup-overload',name:'Peanut Butter Cup Overload',brand:"Ben & Jerry's",flavor:'Peanut Butter Cup',style:'full',program:'Ice Cream',color:'#D8AE76',
+  base:[['milk',240],['cream',120],['pb',4],['sugar',60],['salt',1]],mix:[['pbcup',6,'quartered']],
+  tip:'Peanut butter adds fat and protein, so this base needs less cream than the others.'},
+ {id:'late-night-dough',name:'Late Night Dough',brand:"Ben & Jerry's",flavor:'The Tonight Dough',style:'full',program:'Ice Cream',color:'#A47553',
+  base:[['milk',230],['cream',150],['dulce',4],['sugar',25],['cocoa',1],['salt',1]],mix:[['oreo',3,'crushed'],['dough',50]],
+  tip:'Use a peanut butter cookie dough for half the dough pieces to get closer to the original.'},
+ {id:'strawberry-cheesecake-swirl',name:'Strawberry Cheesecake Swirl',brand:"Ben & Jerry's",flavor:'Strawberry Cheesecake',style:'full',program:'Ice Cream',color:'#F5E6E1',
+  base:[['ccg',100],['greek5',100],['milk',140],['cream',80],['sugar',70],['lemon',1],['vanilla',1],['salt',1]],mix:[['straw',70,'diced, tossed with 1 tsp sugar'],['graham',2,'broken up']],
+  tip:'Real cream cheese plus Greek yogurt and lemon gives the full cheesecake tang and a dense, scoopable texture.'},
+ {id:'cheesecake-brownie',name:'Cheesecake Brownie',brand:"Ben & Jerry's",flavor:'Cheesecake Brownie',style:'full',program:'Ice Cream',color:'#F4EAD9',
+  base:[['ccg',100],['milk',200],['cream',100],['sugar',70],['lemon',0.5],['vanilla',1],['salt',1]],mix:[['brownie',70,'frozen 20 min first']],
+  tip:'Freeze the brownie cubes before mixing in so they stay in chunks.'},
+ {id:'triple-buzz-coffee',name:'Triple Buzz Coffee',brand:"Ben & Jerry's",flavor:'Coffee Coffee BuzzBuzzBuzz!',style:'full',program:'Ice Cream',color:'#B58764',
+  base:[['milk',220],['cream',170],['sugar',70],['espresso',2],['salt',1]],mix:[['beans',30,'roughly chopped'],['dark',15]],
+  tip:'Dissolve the espresso powder in 2 tbsp of hot milk first so no granules end up in the pint.'},
+ {id:'malted-pretzel-fudge',name:'Malted Pretzel Fudge',brand:"Ben & Jerry's",flavor:'Chubby Hubby',style:'full',program:'Ice Cream',color:'#E3CDA2',
+  base:[['milk',230],['cream',160],['malt',3],['sugar',50],['vanilla',1],['salt',1]],mix:[['pretzel',25,'broken'],['pb',1.5,'swirl'],['fudge',1,'swirl']],swirl:true,
+  tip:'Sandwich a little peanut butter between pretzel halves and freeze them before mixing in, like the filled pretzels in the original.'},
+ {id:'mint-cookie-crush',name:'Mint Cookie Crush',brand:"Ben & Jerry's",flavor:'Mint Chocolate Cookie',style:'full',program:'Ice Cream',color:'#E6F0E4',
+  base:[['milk',220],['cream',170],['sugar',70],['mint',0.75],['salt',1]],mix:[['oreo',5,'quartered']],
+  tip:'Peppermint extract varies a lot. Start with ½ tsp, taste the base, then add more.'},
+ {id:'couch-night-pb-pretzel',name:'Couch Night PB Pretzel',brand:"Ben & Jerry's",flavor:"Netflix & Chill'd",style:'full',program:'Ice Cream',color:'#CDA06E',
+  base:[['milk',240],['cream',120],['pb',3],['sugar',60],['salt',1]],mix:[['pretzel',20,'broken'],['brownie',40]]},
+ {id:'double-pistachio',name:'Double Pistachio',brand:"Ben & Jerry's",flavor:'Pistachio Pistachio',style:'full',program:'Ice Cream',color:'#D6DBA9',
+  base:[['milk',240],['cream',150],['pistachio',50,'blended in, very fine'],['sugar',70],['salt',1]],mix:[['pistachio',25,'roasted and chopped']],
+  tip:'Blend the pistachios with the milk for a full minute and strain if you want it silky. A drop of almond extract makes the pistachio flavour pop.'},
+ {id:'caramel-chew-fudge',name:'Caramel Chew Fudge',brand:"Ben & Jerry's",flavor:'Caramel Chew Chew',style:'full',program:'Ice Cream',color:'#D6AE79',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',35],['salt',1]],mix:[['caramel',2,'swirl'],['dark',30,'chunks']],swirl:true},
+
+ {id:'cinnamon-buns',name:'Cinnamon Bun Swirl',brand:"Ben & Jerry's",flavor:'Cinnamon Buns',style:'full',program:'Ice Cream',color:'#EAD3AE',
+  base:[['milk',220],['cream',170],['sugar',40],['brown',30],['cinnamon',1],['vanilla',1],['salt',1]],mix:[['dough',50,'tossed with ½ tsp cinnamon'],['brown',10,'mixed with the butter and a pinch of cinnamon'],['butter',5,'melted']],
+  tip:'Spoon the cinnamon-sugar butter into the well last for the cinnamon-roll streaks.'},
+ {id:'chocolate-therapy',name:'Chocolate Comfort',brand:"Ben & Jerry's",flavor:'Chocolate Therapy',style:'full',program:'Ice Cream',color:'#583425',
+  base:CHOC(3),mix:[['oreo',3,'crushed'],['fudge',2,'swirl']],swirl:true,prep:[BLOOM]},
+ {id:'super-fudge-chunk',name:'Super Fudge Chunk',brand:"Ben & Jerry's",flavor:'New York Super Fudge Chunk',style:'full',program:'Ice Cream',color:'#4F2E21',
+  base:CHOC(3),mix:[['dark',20,'chunks'],['white',15,'chunks'],['pecan',15],['walnut',15]],prep:[BLOOM]},
+ {id:'caramel-core-sutra',name:'Caramel Core Chocolate',brand:"Ben & Jerry's",flavor:'Karamel Sutra Core',style:'full',program:'Ice Cream',color:'#7E5338',
+  base:[['milk',240],['cream',150],['dulce',2],['cocoa',1.5],['sugar',50],['salt',1]],mix:[['chips',25],['caramel',3,'poured into the well as a core']],prep:[BLOOM],
+  tip:'For the core: after MIX-IN with the chips, make a fresh well down the middle and fill it with caramel. Don\'t spin again.'},
+ {id:'milk-and-cookies',name:'Milk & Cookies',brand:"Ben & Jerry's",flavor:'Milk & Cookies',style:'full',program:'Ice Cream',color:'#EFE6D6',
+  base:SW(65),mix:[['cookie',2,'broken'],['oreo',2,'crushed']]},
+ {id:'banana-caramel-love',name:'Banana Caramel Love',brand:"Ben & Jerry's",flavor:'One Love',style:'full',program:'Ice Cream',color:'#EFDCA4',
+  base:[['banana',1,'very ripe'],['milk',200],['cream',140],['sugar',40],['vanilla',1],['salt',1]],mix:[['caramel',1.5,'swirl'],['graham',1,'tossed with a pinch of cinnamon'],['dark',15,'chunks']],swirl:true},
+ {id:'pb-half-baked',name:'PB Half & Half Baked',brand:"Ben & Jerry's",flavor:'Peanut Butter Half Baked',style:'full',program:'Ice Cream',color:'#A97C58',
+  base:[['milk',240],['cream',120],['pb',2],['cocoa',1.5],['sugar',60],['salt',1]],mix:[['brownie',40],['dough',40,'peanut butter cookie dough if you can find it']],prep:[BLOOM]},
+ {id:'mocha-boom',name:'Mocha Caramel Boom',brand:"Ben & Jerry's",flavor:'Boom Chocolatta',style:'full',program:'Ice Cream',color:'#8A5E43',
+  base:[['milk',240],['cream',150],['sugar',65],['cocoa',1.5],['espresso',1.5],['salt',1]],mix:[['caramel',1.5,'swirl'],['oreo',2,'crushed'],['dark',15,'chunks']],swirl:true,prep:[BLOOM]},
+ {id:'smores-campfire',name:"S'mores Campfire",brand:"Ben & Jerry's",flavor:"Gimme S'more!",style:'full',program:'Ice Cream',color:'#E2C7A0',
+  base:[['milk',230],['cream',160],['sugar',45],['brown',20],['vanilla',1],['salt',1]],mix:[['fluff',2,'toasted under the grill until golden, swirl'],['graham',2,'broken'],['dark',20,'chunks']],swirl:true},
+ {id:'coconut-seven-layer',name:'Coconut Seven Layer',brand:"Ben & Jerry's",flavor:'Coconut Seven Layer Bar',style:'full',program:'Ice Cream',color:'#F2EBDC',
+  base:[['milk',200],['cream',150],['cocomilk',80],['sugar',65],['salt',1]],mix:[['graham',2,'broken'],['walnut',15],['dark',15,'chunks'],['coconut',10,'toasted']]},
+
+ {id:'vanilla-caramel-fudge',name:'Vanilla Caramel Fudge',brand:"Ben & Jerry's",flavor:'Vanilla Caramel Fudge',style:'full',program:'Ice Cream',color:'#F4E8CC',
+  base:SW(60),mix:[['caramel',2,'swirl'],['fudge',2,'swirl']],swirl:true,
+  tip:'Run MIX-IN only once so the two sauces stay as separate ribbons.'},
+ {id:'triple-caramel-chunk',name:'Triple Caramel Chunk',brand:"Ben & Jerry's",flavor:'Triple Caramel Chunk',style:'full',program:'Ice Cream',color:'#DDB683',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',1]],mix:[['caramel',2,'swirl'],['toffee',20],['dark',20,'chunks']],swirl:true},
+ {id:'brownie-batter-core',name:'Brownie Batter Core',brand:"Ben & Jerry's",flavor:'Brownie Batter Core',style:'full',program:'Ice Cream',color:'#8A5C42',
+  base:[['milk',240],['cream',150],['sugar',70],['cocoa',1.5],['vanilla',1],['salt',1]],mix:[['brownie',40],['fudge',3,'poured into the well as a core']],prep:[BLOOM],
+  tip:'After MIX-IN with the brownie pieces, make a fresh well down the middle, fill it with fudge and don\'t spin again.'},
+ {id:'peanut-butter-world',name:'Peanut Butter World',brand:"Ben & Jerry's",flavor:'Peanut Butter World',style:'full',program:'Ice Cream',color:'#6A4331',
+  base:CHOC(2.5),mix:[['pb',2,'swirl'],['oreo',3,'crushed']],swirl:true,prep:[BLOOM]},
+ {id:'everything-but-the',name:'Everything But The Sink',brand:"Ben & Jerry's",flavor:'Everything But The…',style:'full',program:'Ice Cream',color:'#B08A68',
+  base:[['milk',240],['cream',150],['sugar',65],['cocoa',1],['vanilla',1],['salt',1]],mix:[['pbcup',3,'quartered'],['toffee',15],['white',15,'chunks'],['almond',15]]},
+ {id:'cannoli',name:'Cannoli',brand:"Ben & Jerry's",flavor:'Cannoli',style:'full',program:'Ice Cream',color:'#F5EDDC',
+  base:[['milk',240],['mascarpone',90],['cream',40],['sugar',65],['vanilla',1],['zest',0.5,'lemon'],['salt',1]],mix:[['cone',30,'broken, tossed with the melted chocolate'],['dark',20,'melted'],['minichips',15]],
+  tip:'Mascarpone gives the cannoli-cream taste and works as the binder, like cream cheese in the cheesecake recipes.'},
+ {id:'blondie-ambition',name:'Blondie Ambition',brand:"Ben & Jerry's",flavor:'Blondie Ambition',style:'full',program:'Ice Cream',color:'#EBD3A5',
+  base:[['milk',220],['cream',170],['brown',55],['sugar',10],['vanilla',1],['salt',1]],mix:[['blondie',45,'cubed'],['toffee',15],['caramel',1.5,'swirl']],swirl:true},
+ {id:'red-velvet-cake-bj',name:'Red Velvet Cake',brand:"Ben & Jerry's",flavor:'Red Velvet Cake',style:'full',program:'Ice Cream',color:'#C05560',
+  base:[['milk',240],['cream',140],['sugar',70],['cocoa',1],['vanilla',1],['salt',1]],mix:[['cake',35,'red velvet cake, crumbled'],['ccg',30,'beaten with 1 tsp of the sugar, dolloped in as a frosting swirl']],swirl:true,
+  prep:['For the red colour, add a few drops of food colouring or 1 tbsp beet juice to the base.']},
+ {id:'oat-of-this-swirled',name:'Oat Cookie Swirled',brand:"Ben & Jerry's",flavor:'Oat of This Swirled',style:'full',program:'Ice Cream',color:'#E6CFA5',
+  base:[['milk',220],['cream',170],['brown',55],['sugar',10],['cinnamon',0.5],['salt',1]],mix:[['oatcookie',2,'broken'],['fudge',1.5,'swirl'],['cinnamon',0.25,'stirred into the fudge']],swirl:true},
+ {id:'chip-happens',name:'Chip Happens',brand:"Ben & Jerry's",flavor:'Chip Happens',style:'full',program:'Ice Cream',color:'#5A3628',
+  base:CHOC(3),mix:[['dark',25,'chunks'],['crisps',15,'crushed, tossed with 10 g melted chocolate']],prep:[BLOOM],
+  tip:'Coating the crushed potato chips in melted chocolate keeps them crunchy. Add them last and run MIX-IN once.'},
+ {id:'mint-chocolate-chance',name:'Mint Chocolate Chance',brand:"Ben & Jerry's",flavor:'Mint Chocolate Chance',style:'full',program:'Ice Cream',color:'#E4F0E2',
+  base:[['milk',220],['cream',170],['sugar',70],['mint',0.75],['salt',1]],mix:[['brownie',55,'frozen 20 min first']]},
+ {id:'pumpkin-cheesecake',name:'Pumpkin Cheesecake',brand:"Ben & Jerry's",flavor:'Pumpkin Cheesecake',style:'full',program:'Ice Cream',color:'#E9B878',
+  base:[['ccg',80],['pumpkin',100],['milk',160],['cream',60],['brown',40],['sugar',30],['cinnamon',0.5],['clove',0.25],['salt',1]],mix:[['graham',2,'broken']]},
+ {id:'salted-caramel-core',name:'Salted Caramel Core',brand:"Ben & Jerry's",flavor:'Salted Caramel Core',style:'full',program:'Ice Cream',color:'#EAD2A6',
+  base:[['milk',230],['cream',160],['brown',30],['sugar',35],['vanilla',1],['salt',1]],mix:[['blondie',40,'cubed'],['caramel',3,'salted, poured into the well as a core'],['salt',1,'flaky, on the caramel']]},
+ {id:'coffee-cookie-mudslide',name:'Coffee Cookie Mudslide',brand:"Ben & Jerry's",flavor:'Dublin Mudslide (alcohol-free)',style:'full',program:'Ice Cream',color:'#C8A483',
+  base:[['milk',220],['cream',170],['sugar',65],['espresso',1],['vanilla',1.5],['salt',1]],mix:[['cookie',2,'broken'],['fudge',1.5,'swirl'],['espresso',0.5,'stirred into the fudge']],swirl:true},
+
+ /* Nirvana (Greece) */
+ {id:'double-choc-chip',name:'Double Choc Chip',brand:'Nirvana',flavor:'Chocolate & Choco Chips',style:'full',program:'Ice Cream',color:'#5A3527',
+  base:CHOC(3),mix:[['chips',40]],prep:[BLOOM]},
+ {id:'cookies-cream-loaded',name:'Cookies & Cream Loaded',brand:'Nirvana',flavor:'Cookies & Cream',style:'full',program:'Ice Cream',color:'#E8E4DE',
+  base:[['milk',220],['cream',170],['sugar',65],['oreo',1,'blended in'],['vanilla',1],['salt',1]],mix:[['oreo',5,'half crumbs, half quarters']],
+  tip:'One cookie blended into the base gives the speckled grey colour of the store tub.'},
+ {id:'hazelnut-praline-cream',name:'Hazelnut Praline Cream',brand:'Nirvana',flavor:'Pralines & Cream',style:'full',program:'Ice Cream',color:'#EBD8B5',
+  base:[['milk',220],['cream',170],['sugar',45],['brown',25],['vanilla',1],['salt',1]],mix:[['hazelnut',35,'caramelised'],['sugar',25,'for caramelising'],['caramel',2,'swirl']],swirl:true,
+  prep:['Caramelise the hazelnuts: melt the 25 g sugar in a pan until amber, stir in the toasted hazelnuts, tip onto baking paper, cool and chop.']},
+ {id:'brownie-salted-caramel',name:'Brownie Salted Caramel',brand:'Nirvana',flavor:'Brownies & Salt Caramel',style:'full',program:'Ice Cream',color:'#D9B585',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',2]],mix:[['brownie',50,'frozen 20 min first'],['caramel',2,'swirl'],['salt',1,'flaky, over the caramel']],swirl:true},
+ {id:'raspberry-truffle',name:'Raspberry Truffle',brand:'Nirvana',flavor:'Raspberry Truffle',style:'full',program:'Ice Cream',color:'#EFC4CF',
+  base:[['milk',200],['cream',160],['rasp',80,'blended and strained'],['sugar',75],['lemon',0.5],['salt',1]],mix:[['dark',35,'in truffle-size chunks'],['jam',2,'raspberry jam, swirl']],swirl:true},
+ {id:'choco-fudge-caramel-wafer',name:'Choco Fudge Caramel Wafer',brand:'Nirvana',flavor:'Choco Fudge Caramel & Choco Wafers',style:'full',program:'Ice Cream',color:'#5E3A2A',
+  base:CHOC(2.5),mix:[['wafer',30,'broken'],['fudge',1.5,'swirl'],['caramel',1.5,'swirl']],swirl:true,prep:[BLOOM],
+  tip:'Add the wafers last and run MIX-IN only once so they stay crisp.'},
+ {id:'hazelnut-caramel-white-choc',name:'Hazelnut Caramel White Choc',brand:'Nirvana',flavor:'Caramel Fudge Hazelnut & White Choco',style:'full',program:'Ice Cream',color:'#CDAE86',
+  base:[['milk',240],['cream',140],['hazelnut',40,'toasted, blended very fine'],['sugar',70],['salt',1]],mix:[['caramel',2,'swirl'],['white',30,'chopped']],swirl:true,
+  tip:'Blend the hazelnuts with the milk for a full minute and strain for a silky base.'},
+ {id:'yogurt-dark-cookies',name:'Yogurt Dark Cookies',brand:'Nirvana',flavor:'Yogurt Dark Cookies',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#F3F1EC',
+  base:[['greek5',250],['milk',100],['cream',60],['sugar',70],['lemon',0.5],['salt',1]],mix:[['oreo',4,'crushed'],['fudge',1.5,'swirl']],swirl:true},
+
+ /* Kri Kri (Greece) */
+ {id:'greek-yogurt-honey',name:'Greek Yogurt & Honey',brand:'Kri Kri',flavor:'Frozen Greek Yogurt with Honey',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#F3E9CF',
+  base:[['greek5',300],['milk',100],['honey',4],['sugar',20],['salt',1]],mix:[['honey',1,'drizzle']],swirl:true,
+  tip:'Use a thick strained Greek yogurt. Thyme honey gives the most Greek flavour.'},
+ {id:'yogurt-sour-cherry',name:'Yogurt Sour Cherry',brand:'Kri Kri',flavor:'Greek Yogurt Amarena',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#F2E4E7',
+  base:[['greek5',280],['milk',100],['cream',40],['sugar',55],['vanilla',1]],mix:[['vyssino',3,'with some syrup']],swirl:true,
+  tip:'Greek βύσσινο spoon sweet or amarena cherries in syrup both work.'},
+ {id:'yogurt-salted-caramel',name:'Yogurt Salted Caramel',brand:'Kri Kri',flavor:'Greek Yogurt Salted Caramel',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#E9D7B8',
+  base:[['greek5',280],['milk',120],['dulce',3],['sugar',25],['salt',2]],mix:[['caramel',1.5,'swirl']],swirl:true},
+ {id:'peach-frozen-yogurt',name:'Peach Frozen Yogurt',brand:'Kri Kri',flavor:'Peach Frozen Yogurt',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#F8CFA6',
+  base:[['peach',220,'ripe, or canned and drained'],['greek5',180],['honey',3],['sugar',20],['lemon',0.5]],mix:[]},
+
+ /* Delta (Greece) — built on Delta dairy */
+ {id:'strawberry-yogurt-condensed',name:'Strawberry Yogurt Condensed',brand:'Delta',flavor:'yogurt, strawberry & Βλάχας condensed milk recipe',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#F2B8C3',
+  base:[['straw',180,'blended'],['greek2',170],['condensed',90,'Βλάχας-style'],['lemon',0.5]],mix:[['straw',40,'diced']],
+  tip:'Delta publishes a no-machine version of this with Complet yogurt and condensed milk. In the machine, strained yogurt gives a smoother, less icy result.'},
+ {id:'fior-di-latte-vlachas',name:'Fior di Latte Βλάχας',brand:'Delta',flavor:'Βλάχας condensed milk ice cream',style:'full',program:'Gelato',color:'#FBF7EC',
+  base:[['milk',280],['cream',80],['condensed',100,'Βλάχας-style'],['salt',1]],mix:[],
+  tip:'Condensed milk brings sugar and milk solids together, so this spins up dense and smooth with very little cream.'},
+ {id:'chocolate-milk-ice-cream',name:'Chocolate Milk Ice Cream',brand:'Delta',flavor:'Milko chocolate milk',style:'full',program:'Ice Cream',color:'#9C6B4E',
+  base:[['chocmilk',330],['cream',80],['sugar',30],['cocoa',1],['salt',1]],mix:[],
+  tip:'Tastes exactly like frozen Milko. For a lean version, skip the cream and add 120 g strained yogurt and 1 scoop chocolate protein.'},
+ {id:'yogurt-honey-walnut',name:'Yogurt Honey Walnut',brand:'Delta',flavor:'strained yogurt with honey & walnuts',style:'full',program:'Frozen Yogurt',kind:'froyo',color:'#F3EAD5',
+  base:[['greek2',300],['milk',80],['honey',4],['sugar',15],['salt',1]],mix:[['walnut',25,'toasted'],['honey',1,'drizzle']],swirl:true,
+  tip:'The classic Greek dessert of yogurt, honey and walnuts, frozen. Thyme honey works best.'},
+
+ /* Magnum / Cornetto */
+ {id:'choc-shell-vanilla',name:'Choc Shell Vanilla',brand:'Algida',flavor:'Magnum Classic',style:'full',program:'Ice Cream',color:'#F4EAD2',
+  base:[['milk',180],['cream',220],['sugar',75],['vanilla',2],['salt',1]],mix:[['dark',40,'melted'],['cocooil',2,'melted with the chocolate']],
+  tip:'Melt the chocolate with the coconut oil and let it cool until just warm. Drizzle it into the well and run MIX-IN: it sets into crackly shards like the Magnum shell.'},
+ {id:'almond-choc-shell',name:'Almond Choc Shell',brand:'Algida',flavor:'Magnum Almond',style:'full',program:'Ice Cream',color:'#F2E6CB',
+  base:[['milk',180],['cream',220],['sugar',75],['vanilla',2],['salt',1]],mix:[['dark',40,'melted'],['cocooil',2,'melted with the chocolate'],['almond',25]],
+  tip:'Stir the almonds into the cooled melted chocolate before drizzling it in.'},
+ {id:'cone-classico',name:'Cone Classico',brand:'Algida',flavor:'Cornetto Classico',style:'full',program:'Ice Cream',color:'#F1E3C6',
+  base:SW(70),mix:[['cone',30],['dark',20,'melted, tossed with the cone'],['hazelnut',20,'chopped'],['fudge',1,'swirl']],swirl:true},
+
+ {id:'cone-choco',name:'Cone Choco',brand:'Algida',flavor:'Cornetto Choco',style:'full',program:'Ice Cream',color:'#6A4331',
+  base:CHOC(2.5),mix:[['cone',30],['dark',25,'melted, tossed with the cone'],['fudge',1,'swirl']],swirl:true,prep:[BLOOM]},
+ {id:'cone-caramel',name:'Cone Caramel',brand:'Algida',flavor:'Cornetto Caramel',style:'full',program:'Ice Cream',color:'#E5C79A',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',1]],mix:[['cone',30],['dark',20,'melted, tossed with the cone'],['caramel',2,'swirl']],swirl:true},
+ {id:'stracciatella',name:'Stracciatella',brand:'Algida',flavor:"Carte d'Or Stracciatella",style:'full',program:'Gelato',color:'#F7F1E4',
+  base:[['milk',260],['cream',140],['sugar',70],['vanilla',1],['salt',1]],mix:[['dark',40,'melted'],['cocooil',1,'melted with the chocolate']],
+  tip:'Drizzle the warm (not hot) chocolate into the well and run MIX-IN once. It shatters into fine flecks.'},
+ {id:'nocciolato',name:'Nocciolato',brand:'Algida',flavor:"Carte d'Or Nocciolato",style:'full',program:'Gelato',color:'#C9A47C',
+  base:[['milk',260],['cream',110],['hazelnut',45,'toasted, blended very fine'],['sugar',70],['salt',1]],mix:[['nutella',2,'swirl'],['hazelnut',15,'chopped']],swirl:true},
+ {id:'creme-caramel',name:'Crème Caramel',brand:'Algida',flavor:"Carte d'Or Crème Caramel",style:'full',program:'Ice Cream',color:'#EFD8A8',
+  base:[['milk',240],['cream',150],['sugar',55],['vanilla',1.5],['salt',1]],mix:[['caramel',3,'dark, slightly burnt caramel, swirl']],swirl:true,
+  tip:'Cook the caramel a shade darker than usual for the bitter-sweet crème caramel top.'},
+ {id:'triple-chocolate',name:'Triple Chocolate',brand:'Algida',flavor:"Carte d'Or Triple Chocolate",style:'full',program:'Gelato',color:'#4F2F22',
+  base:[['milk',250],['cream',140],['sugar',70],['cocoa',2.5],['dark',25,'melted into the warm milk'],['salt',1]],mix:[['white',20,'chopped'],['fudge',1.5,'swirl']],swirl:true,prep:[BLOOM]},
+ {id:'layered-vanilla-crisp',name:'Layered Vanilla Crisp',brand:'Algida',flavor:'Viennetta',style:'full',program:'Ice Cream',color:'#F6EEDB',
+  base:[['milk',200],['cream',200],['sugar',70],['vanilla',1.5],['salt',1]],mix:[['dark',45,'melted'],['cocooil',2,'melted with the chocolate']],
+  tip:'For Viennetta layers: after spinning, spoon a third into a bowl, drizzle a thin layer of chocolate, let it set 1 minute, repeat twice. Freeze 15 minutes.'},
+ {id:'twisted-fruit',name:'Twisted Fruit',brand:'Algida',flavor:'Twister',style:'sorbet',program:'Sorbet',color:'#E5F07A',
+  base:[['pine',200],['straw',120],['sugar',55],['lime',2],['water',40]],mix:[],
+  tip:'For the Twister swirl, blend pineapple-lime and strawberry separately and pour them into the tub side by side before freezing.'},
+ {id:'lemon-ice',name:'Lemon Ice',brand:'Algida',flavor:'Calippo Lemon',style:'sorbet',program:'Sorbet',color:'#F6EE9A',
+  base:[['lemonml',120],['water',260],['sugar',100],['zest',1]],mix:[],
+  tip:'Water ices need the full sugar to stay spoonable. Dissolve it in the water first, then add the juice and zest.'},
+ {id:'orange-ice',name:'Orange Ice',brand:'Algida',flavor:'Calippo Orange',style:'sorbet',program:'Sorbet',color:'#F8A848',
+  base:[['oj',380,'fresh, with pulp'],['sugar',60],['lemon',1],['zest',1,'orange zest']],mix:[]},
+ {id:'exotic-mango-passion',name:'Exotic Mango Passion',brand:'Algida',flavor:'Solero Exotic',style:'sorbet',program:'Sorbet',color:'#F7B23A',
+  base:[['mango',260],['passion',60],['water',60],['sugar',50],['lime',1]],mix:[]},
+
+ /* Greek classics */
+ {id:'kaimaki',name:'Kaimaki',brand:'Greek classics',flavor:'Παγωτό καϊμάκι',style:'full',program:'Ice Cream',color:'#FAF6EC',
+  base:[['milk',220],['cream',180],['sugar',75],['mastic',0.5,'ground with 1 tsp of the sugar'],['salt',1]],mix:[],
+  tip:'Traditional kaimaki is thickened with salepi; this version leaves it out and relies on the cream. Too much mastic turns bitter, so stick to ½ tsp.'},
+ {id:'baklava',name:'Baklava',brand:'Greek classics',flavor:'Baklava ice cream',style:'full',program:'Ice Cream',color:'#EED9AE',
+  base:[['milk',230],['cream',160],['honey',3],['sugar',35],['cinnamon',0.5],['salt',1]],mix:[['walnut',30,'toasted'],['phyllo',1,'brushed with butter, baked crisp, crumbled'],['honey',1,'drizzle']],swirl:true},
+ {id:'frappe',name:'Frappé',brand:'Greek classics',flavor:'Greek frappé',style:'full',program:'Ice Cream',color:'#C49C78',
+  base:[['milk',250],['cream',140],['sugar',70],['instcoffee',3,'Nescafé-style instant']],mix:[],
+  prep:['Shake the instant coffee with 2 tbsp of the sugar and 3 tbsp cold water until thick foam, like a frappé, then blend into the rest of the base.']},
+
+ {id:'loukoumades',name:'Loukoumades',brand:'Greek classics',flavor:'Λουκουμάδες',style:'full',program:'Ice Cream',color:'#EFD9A8',
+  base:[['milk',230],['cream',160],['honey',3],['sugar',35],['cinnamon',0.5],['salt',1]],mix:[['loukoumas',4,'halved'],['honey',1.5,'drizzle'],['walnut',15,'chopped']],swirl:true,
+  tip:'Use loukoumades from the bakery or day-old ones. Freeze them for 20 minutes before mixing in so they stay in pieces.'},
+ {id:'bougatsa',name:'Bougatsa',brand:'Greek classics',flavor:'Μπουγάτσα με κρέμα',style:'full',program:'Ice Cream',color:'#F5E8C8',
+  base:[['milk',240],['cream',160],['sugar',65],['vanilla',2],['zest',0.5],['salt',1]],mix:[['phyllo',2,'brushed with the butter, baked crisp, crumbled'],['butter',10,'melted, for brushing'],['sugar',10,'icing sugar, dusted on top'],['cinnamon',0.5,'dusted on top']],
+  tip:'Bougatsa cream is usually set with semolina; here the cream gives the body instead. Dust with icing sugar and cinnamon right before serving, like the real thing.'},
+ {id:'melomakarono',name:'Melomakarono',brand:'Greek classics',flavor:'Μελομακάρονο',style:'full',program:'Ice Cream',color:'#D9B07E',
+  base:[['milk',230],['cream',150],['honey',3],['brown',30],['cinnamon',1],['clove',0.25],['orangezest',1],['salt',1]],mix:[['melomakarono',2,'crumbled'],['walnut',15,'chopped'],['honey',1,'drizzle']],swirl:true},
+ {id:'kourabies',name:'Kourabies',brand:'Greek classics',flavor:'Κουραμπιές',style:'full',program:'Ice Cream',color:'#F8F3E8',
+  base:[['milk',230],['cream',160],['sugar',65],['rosewater',0.5],['vanilla',1],['salt',1]],mix:[['kourabies',2,'crumbled'],['almond',15,'toasted']],
+  tip:'Rose water is strong. Start with ¼ tsp, taste, then add more.'},
+ {id:'tsoureki',name:'Tsoureki',brand:'Greek classics',flavor:'Τσουρέκι',style:'full',program:'Ice Cream',color:'#F2DFB0',
+  base:[['milk',230],['cream',160],['sugar',65],['mahlab',0.5],['mastic',0.25,'ground with 1 tsp of the sugar'],['orangezest',1],['salt',1]],mix:[['tsoureki',40,'cubed and toasted until crisp']],
+  tip:'Warm the milk with the mahlepi and orange zest, steep 15 minutes and cool before blending. Toasting the tsoureki keeps it from going soggy.'},
+ {id:'tahini-halva',name:'Tahini Halva',brand:'Greek classics',flavor:'Χαλβάς ταχινιού',style:'full',program:'Ice Cream',color:'#E1CCA6',
+  base:[['milk',250],['cream',100],['tahini',3],['honey',2],['sugar',30],['salt',1]],mix:[['halva',40,'crumbled']],
+  tip:'Tahini brings its own fat, so this base needs less cream. Marble halva with cocoa makes a great chocolate version.'},
+ {id:'ekmek-kataifi',name:'Ekmek Kataifi',brand:'Greek classics',flavor:'Εκμέκ κανταΐφι',style:'full',program:'Ice Cream',color:'#F3E4C2',
+  base:[['milk',230],['cream',160],['sugar',60],['vanilla',1.5],['cinnamon',0.25],['salt',1]],mix:[['kataifi',25,'baked crisp, tossed with 1 tbsp of the honey'],['honey',1],['pistachio',15,'chopped']]},
+ {id:'portokalopita',name:'Portokalopita',brand:'Greek classics',flavor:'Πορτοκαλόπιτα',style:'full',program:'Ice Cream',color:'#F7D9A0',
+  base:[['greek5',150],['milk',160],['cream',80],['oj',40],['sugar',65],['orangezest',1.5],['salt',1]],mix:[['phyllo',1,'baked crisp, crumbled'],['honey',1,'warmed with 1 tbsp orange juice, drizzled']],swirl:true},
+ {id:'greek-coffee',name:'Greek Coffee',brand:'Greek classics',flavor:'Ελληνικός καφές',style:'full',program:'Ice Cream',color:'#9E7354',
+  base:[['milk',230],['cream',160],['sugar',70],['espressoml',60,'strong Greek coffee, strained'],['salt',1]],mix:[],
+  prep:['Brew 2 heaped tsp of Greek coffee in 70 ml water in a μπρίκι, let the grounds settle, then pour off the coffee and cool it.'],
+  tip:'For a "glykos" coffee taste, keep the sugar; for "metrios", drop it to 55 g.'},
+
+ {id:'galaktoboureko',name:'Galaktoboureko',brand:'Greek classics',flavor:'Γαλακτομπούρεκο',style:'full',program:'Ice Cream',color:'#F6E3B4',
+  base:[['milk',240],['cream',160],['sugar',55],['vanilla',1.5],['zest',1,'lemon'],['salt',1]],mix:[['phyllo',2,'brushed with the butter, baked crisp, crumbled'],['butter',10,'melted, for brushing'],['sugar',15,'boiled with 2 tbsp water and a strip of lemon peel into a syrup, cooled']],swirl:true,
+  tip:'Real galaktoboureko custard is set with semolina and eggs; here cream does that job. Drizzle the cooled syrup over the phyllo just before mixing in so it stays crisp in places.'},
+ {id:'rizogalo',name:'Rizogalo',brand:'Greek classics',flavor:'Ρυζόγαλο',style:'full',program:'Ice Cream',color:'#F8F2E4',
+  base:[['milk',280],['cream',120],['sugar',60],['zest',1,'lemon peel, steeped then removed'],['salt',1]],mix:[['rice',40,'from cold rizogalo'],['cinnamon',0.5,'dusted on top']],
+  prep:['Warm the milk with a strip of lemon peel until steaming, steep 15 minutes, remove the peel and cool before blending.'],
+  tip:'Rice firms up when frozen, so keep the spoonfuls small and eat this tub within a day or two.'},
+ {id:'karidopita',name:'Karidopita',brand:'Greek classics',flavor:'Καρυδόπιτα',style:'full',program:'Ice Cream',color:'#D8B48A',
+  base:[['milk',230],['cream',150],['brown',40],['honey',1],['cinnamon',1],['clove',0.25],['salt',1]],mix:[['karidopita',40,'cubed'],['walnut',15,'chopped']]},
+ {id:'revani',name:'Revani',brand:'Greek classics',flavor:'Ρεβανί',style:'full',program:'Ice Cream',color:'#F5DFA6',
+  base:[['greek5',120],['milk',180],['cream',100],['sugar',60],['orangezest',1],['lemon',0.5],['salt',1]],mix:[['revani',45,'cubed']],
+  tip:'Semolina belongs in the cake pieces, not the base, so the ice cream itself stays binder-free.'},
+ {id:'ypovrychio',name:'Ypovrychio',brand:'Greek classics',flavor:'Υποβρύχιο βανίλια',style:'full',program:'Ice Cream',color:'#FDFCF8',
+  base:[['milk',240],['cream',160],['vanilia',3.5,'replaces the sugar'],['salt',1]],mix:[['vanilia',1,'swirl']],swirl:true,
+  tip:'The mastic-scented vanilia fondant is both the sugar and the flavour. Blend it with warm milk so it dissolves fully.'},
+ {id:'fig-thyme-honey',name:'Fig & Thyme Honey',brand:'Greek classics',flavor:'Σύκο με θυμαρίσιο μέλι',style:'full',program:'Ice Cream',color:'#EBDACB',
+  base:[['greek5',150],['milk',160],['cream',90],['honey',3,'thyme honey'],['sugar',20],['salt',1]],mix:[['figs',40,'chopped'],['walnut',15,'chopped']]},
+ {id:'pasteli',name:'Pasteli',brand:'Greek classics',flavor:'Παστέλι',style:'full',program:'Ice Cream',color:'#E8D2A0',
+  base:[['milk',230],['cream',150],['honey',3],['sugar',30],['sesame',10,'blended in'],['salt',1]],mix:[['pasteli',35,'broken into shards']]},
+ {id:'mosaiko',name:'Mosaiko',brand:'Greek classics',flavor:'Μωσαϊκό',style:'full',program:'Ice Cream',color:'#5A3828',
+  base:[['milk',250],['cream',130],['sugar',70],['cocoa',2.5],['dark',20,'melted into the warm milk'],['salt',1]],mix:[['petitbeurre',4,'broken']],prep:[BLOOM],
+  tip:'Petit-beurre biscuits soften slightly in the freezer, just like in a real mosaiko.'},
+ {id:'kok',name:'Kok',brand:'Greek classics',flavor:'Κωκ',style:'full',program:'Ice Cream',color:'#F4E6CC',
+  base:[['milk',230],['cream',160],['sugar',65],['vanilla',1.5],['salt',1]],mix:[['sponge',30,'cubed'],['dark',30,'melted'],['cocooil',1,'melted with the chocolate']],
+  tip:'The melted chocolate sets into a crackly glaze when it hits the cold ice cream, like the top of a kok.'},
+ {id:'profiterole',name:'Profiterole',brand:'Greek classics',flavor:'Προφιτερόλ',style:'full',program:'Ice Cream',color:'#F3E7CF',
+  base:[['milk',230],['cream',160],['sugar',60],['vanilla',2],['salt',1]],mix:[['choux',25,'broken'],['fudge',2,'swirl']],swirl:true},
+
+ {id:'lacta-milk-chocolate',name:'Milk Chocolate Bar',brand:'Lacta',flavor:'Lacta milk chocolate',style:'full',program:'Ice Cream',color:'#9A6545',
+  base:[['milk',260],['cream',110],['milkchoc',60,'melted into the warm milk'],['sugar',35],['cocoa',1],['salt',1]],mix:[['milkchoc',30,'chopped']],
+  prep:['Warm half the milk until steaming and stir in the chopped chocolate until melted, then blend with the rest of the base and cool.'],
+  tip:'Milk chocolate is already sweet, so the base needs less sugar than the dark chocolate recipes.'},
+ {id:'caprice-wafer',name:'Hazelnut Wafer Rolls',brand:'Papadopoulou',flavor:'Caprice',style:'full',program:'Ice Cream',color:'#D9BC95',
+  base:[['milk',240],['cream',130],['nutella',2],['sugar',40],['salt',1]],mix:[['caprice',35,'broken into short pieces']],
+  tip:'Add the wafer rolls last and run MIX-IN once so they stay crunchy.'},
+ {id:'diples',name:'Diples',brand:'Greek classics',flavor:'Δίπλες',style:'full',program:'Ice Cream',color:'#F0DDAE',
+  base:[['milk',230],['cream',160],['honey',3],['sugar',35],['cinnamon',0.5],['salt',1]],mix:[['diples',30],['walnut',15,'chopped'],['honey',1,'drizzle']],swirl:true},
+ {id:'sokolatopita',name:'Sokolatopita',brand:'Greek classics',flavor:'Σοκολατόπιτα',style:'full',program:'Ice Cream',color:'#4E2E22',
+  base:CHOC(3),mix:[['sokolatopita',50,'cubed, frozen 20 min first'],['fudge',1.5,'swirl']],swirl:true,prep:[BLOOM]},
+ {id:'moustalevria',name:'Moustalevria',brand:'Greek classics',flavor:'Μουσταλευριά',style:'full',program:'Ice Cream',color:'#B07A6E',
+  base:[['milk',240],['cream',150],['petimezi',4],['sugar',15],['cinnamon',0.5],['salt',1]],mix:[['walnut',20,'toasted'],['sesame',5,'toasted, sprinkled on top']],
+  tip:'Petimezi is the grape-must syrup the real pudding is made from. It is the sweetener here, with no flour to set it.'},
+ {id:'loukoumi-syrou',name:'Loukoumi Syrou',brand:'Greek classics',flavor:'Λουκούμι Σύρου',style:'full',program:'Ice Cream',color:'#F7E3E8',
+  base:[['milk',240],['cream',160],['sugar',60],['rosewater',0.5],['salt',1]],mix:[['loukoumi',40,'diced, dusted in its icing sugar'],['pistachio',10,'chopped']],
+  tip:'Keep the loukoumi dusted so the pieces don\'t stick together in the tub.'},
+
+ /* Häagen-Dazs */
+ {id:'sweet-cream-vanilla-bean',name:'Sweet Cream Vanilla Bean',brand:'Häagen-Dazs',flavor:'Vanilla',style:'full',program:'Ice Cream',color:'#F6ECD3',
+  base:[['milk',180],['cream',220],['sugar',75],['vanilla',2,'or seeds of 1 bean'],['salt',1]],mix:[],
+  tip:'More cream than milk. The extra fat does the job that egg yolks do in the original.'},
+ {id:'dulce-de-leche',name:'Dulce de Leche',brand:'Häagen-Dazs',flavor:'Dulce de Leche',style:'full',program:'Ice Cream',color:'#DBB684',
+  base:[['milk',240],['cream',150],['dulce',4],['sugar',25],['salt',1]],mix:[['dulce',2,'swirl']],swirl:true,
+  tip:'Warm the dulce de leche for the swirl for 10 seconds so it drizzles, then let it cool before adding.'},
+ {id:'dark-roast-coffee',name:'Dark Roast Coffee',brand:'Häagen-Dazs',flavor:'Coffee',style:'full',program:'Ice Cream',color:'#B08665',
+  base:[['milk',200],['cream',190],['sugar',75],['espresso',2.5],['salt',1]],mix:[]},
+ {id:'fresh-strawberry',name:'Fresh Strawberry',brand:'Häagen-Dazs',flavor:'Strawberry',style:'full',program:'Ice Cream',color:'#F1B5BF',
+  base:[['straw',180,'blended'],['milk',120],['cream',140],['sugar',70],['lemon',0.5],['salt',1]],mix:[['straw',40,'diced small']],
+  tip:'Use ripe or frozen-then-thawed strawberries for the base. Underripe berries turn icy and taste flat.'},
+ {id:'belgian-style-chocolate',name:'Belgian-Style Chocolate',brand:'Häagen-Dazs',flavor:'Belgian Chocolate',style:'full',program:'Gelato',color:'#4B2C20',
+  base:[['milk',250],['cream',150],['sugar',70],['cocoa',2],['dark',40,'melted into the warm milk'],['salt',1]],mix:[],
+  prep:['Warm half the milk until steaming, whisk in the cocoa and chopped chocolate until melted, then blend with the rest of the base. Cool before freezing.'],
+  tip:'Melted chocolate adds cocoa butter, which makes the texture dense and fudgy without any thickener.'},
+
+ /* Baskin-Robbins */
+ {id:'pralines-and-caramel',name:'Pralines & Caramel',brand:'Baskin-Robbins',flavor:"Pralines 'n Cream",style:'full',program:'Ice Cream',color:'#EDDBB8',
+  base:[['milk',220],['cream',170],['sugar',45],['brown',25],['vanilla',1],['salt',1]],mix:[['pecan',35,'candied'],['caramel',2,'swirl']],swirl:true,
+  prep:['Candy the pecans: toss with 1 tbsp brown sugar and 1 tsp water, bake at 180 °C for 8 minutes, cool completely.']},
+ {id:'mocha-almond-fudge',name:'Mocha Almond Fudge',brand:'Baskin-Robbins',flavor:'Jamoca Almond Fudge',style:'full',program:'Ice Cream',color:'#AE8463',
+  base:[['milk',220],['cream',170],['sugar',70],['espresso',2],['salt',1]],mix:[['almond',30],['fudge',2,'swirl']],swirl:true},
+ {id:'fresh-mint-chip',name:'Fresh Mint Chip',brand:'Baskin-Robbins',flavor:'Mint Chocolate Chip',style:'full',program:'Ice Cream',color:'#DDEEDD',
+  base:[['milk',220],['cream',170],['sugar',70],['mint',0.75],['spinach',5,'optional, for colour'],['salt',1]],mix:[['dark',35,'shaved']],
+  tip:'A small handful of spinach turns the base pale green with no taste. Leave it out for a white mint chip.'},
+
+ /* Halo Top */
+ {id:'birthday-cake-protein',name:'Birthday Cake Protein',brand:'Halo Top',flavor:'Birthday Cake',style:'protein',program:'Light Ice Cream',color:'#F5ECE6',
+  base:LITE(),mix:[['cake',20],['sprinkles',1]],
+  tip:'A few drops of butter extract in the base makes it taste like cake batter.'},
+ {id:'pb-cup-protein',name:'Peanut Butter Cup Protein',brand:'Halo Top',flavor:'Peanut Butter Cup',style:'protein',program:'Light Ice Cream',color:'#D5B086',
+  base:[['ufmilk',320],['lcc',1],['pb2',3],['wheyV',1],['allulose',2],['salt',1]],mix:[['pbcup',3,'quartered']]},
+ {id:'sea-salt-caramel-protein',name:'Sea Salt Caramel Protein',brand:'Halo Top',flavor:'Sea Salt Caramel',style:'protein',program:'Light Ice Cream',color:'#E6D0A9',
+  base:[['ufmilk',300],['skyr',110],['lcc',1],['wheyV',1],['sfcaramel',3],['salt',2,'flaky']],mix:[['sfcaramel',1,'swirl']],swirl:true},
+ {id:'cookie-dough-protein',name:'Cookie Dough Protein',brand:'Halo Top',flavor:'Chocolate Chip Cookie Dough',style:'protein',program:'Light Ice Cream',color:'#EDE0C5',
+  base:LITE([['salt',1]]),mix:[['dough',30],['minichips',10]],
+  tip:'For a protein cookie dough, mix 2 tbsp powdered peanut butter, 1 tbsp oat flour, 1 tsp maple syrup and a few chocolate chips into small balls and freeze.'},
+ {id:'double-chocolate-protein',name:'Double Chocolate Protein',brand:'Halo Top',flavor:'Chocolate',style:'protein',program:'Light Ice Cream',color:'#694533',
+  base:[['ufmilk',320],['lcc',1],['wheyC',1],['cocoa',2],['allulose',3],['vanilla',1],['salt',1]],mix:[],prep:[BLOOM.replace('the milk','the milk')]},
+
+ /* McDonald's style */
+ {id:'cookies-cream-protein-flurry',name:'Cookies & Cream Protein Flurry',brand:"McDonald's",flavor:'Oreo McFlurry',style:'protein',program:'Light Ice Cream',color:'#F2F0EB',
+  base:FLURRY,mix:[['oreo',4,'crushed']],
+  tip:'Crush half the cookies to crumbs and leave the rest in quarters. The crumbs tint the pint grey like the real thing.'},
+ {id:'candy-crunch-protein-flurry',name:'Candy Crunch Protein Flurry',brand:"McDonald's",flavor:'M&M / Smarties McFlurry',style:'protein',program:'Light Ice Cream',color:'#F3EFE4',
+  base:FLURRY,mix:[['candy',20,'lightly crushed']]},
+ {id:'toffee-caramel-flurry',name:'Toffee Caramel Flurry',brand:"McDonald's",flavor:'Daim McFlurry',style:'protein',program:'Light Ice Cream',color:'#EEE0C4',
+  base:FLURRY,mix:[['toffee',20],['sfcaramel',1,'swirl']],swirl:true},
+ {id:'vanilla-soft-serve-protein',name:'Vanilla Soft Serve Protein',brand:"McDonald's",flavor:'Vanilla Cone',style:'protein',program:'Light Ice Cream',color:'#F7F2E3',
+  base:[['ufmilk',200],['skyr',140],['lcc',1],['wheyV',1],['allulose',2],['vanilla',1.5]],mix:[],
+  tip:'Re-spin twice with 1 tbsp milk each time for a soft-serve texture, then pipe it into a cone straight away.'},
+ {id:'minty-green-shake',name:'Minty Green Shake',brand:"McDonald's",flavor:'Shamrock Shake',style:'full',program:'Milk Shake',color:'#CFE8CF',
+  base:[['milk',200],['cream',150],['sugar',60],['mint',0.5],['vanilla',1],['spinach',8,'for colour']],mix:[['milk',120]],
+  tip:'Top with whipped cream. For a thicker shake, use 80 ml milk instead of 120 ml.'},
+
+ /* Dairy Queen */
+ {id:'turtle-pecan-blizzard',name:'Turtle Pecan Blizzard',brand:'Dairy Queen',flavor:'Turtle Pecan Cluster Blizzard',style:'full',program:'Ice Cream',color:'#F0E4CC',
+  base:SW(70),mix:[['pecan',30],['caramel',2,'swirl'],['fudge',1,'swirl']],swirl:true,
+  tip:'Run MIX-IN twice for a properly blended, Blizzard-style texture.'},
+ {id:'pb-crunch-blizzard',name:'PB Crunch Blizzard',brand:'Dairy Queen',flavor:'Butterfinger Blizzard',style:'full',program:'Ice Cream',color:'#F1E6CF',
+  base:SW(65),mix:[['crunchbar',45]],
+  tip:'Run MIX-IN twice so the candy breaks into small shards through the whole pint.'},
+
+ {id:'oreo-cheesecake-blizzard',name:'Cookie Cheesecake Blizzard',brand:'Dairy Queen',flavor:'Oreo Cheesecake Blizzard',style:'full',program:'Ice Cream',color:'#F1EEEA',
+  base:[['ccg',60],['milk',240],['cream',110],['sugar',65],['vanilla',1],['salt',1]],mix:[['oreo',5,'crushed'],['graham',1,'broken up']],
+  tip:'Run MIX-IN twice for the Blizzard texture.'},
+ {id:'red-velvet-cheesecake',name:'Red Velvet Cheesecake',brand:'Cold Stone',flavor:'Red Velvet Cake Batter',style:'full',program:'Ice Cream',color:'#B6474F',
+  base:[['ccg',60],['milk',250],['cream',100],['sugar',70],['cocoa',1],['vanilla',1],['salt',1]],mix:[['cake',30,'red velvet cake, crumbled']],
+  prep:['Add a few drops of red food colouring or 1 tbsp beet juice to the base if you want the red colour.']},
+
+ /* Dole Whip */
+ {id:'pineapple-whip',name:'Pineapple Whip',brand:'Dole Whip',flavor:'Pineapple Dole Whip',style:'dairyfree',program:'Sorbet',color:'#F6DD72',
+  base:[['pine',300],['cocomilk',120],['sugar',30],['lime',1]],mix:[],
+  tip:'Canned pineapple in juice works better than fresh here: it is sweeter and spins smoother. Re-spin once for the soft-serve swirl.'},
+
+ /* Talenti */
+ {id:'sea-salt-caramel-gelato',name:'Sea Salt Caramel Gelato',brand:'Talenti',flavor:'Sea Salt Caramel Gelato',style:'full',program:'Gelato',color:'#DAB88A',
+  base:[['milk',280],['cream',100],['dulce',3],['sugar',30],['salt',2]],mix:[['caramel',1.5,'swirl'],['dark',20,'small chunks']],swirl:true,
+  tip:'Gelato uses more milk and less cream than ice cream, so it tastes more intensely of caramel.'},
+ {id:'alphonso-mango-sorbetto',name:'Alphonso Mango Sorbetto',brand:'Talenti',flavor:'Alphonso Mango Sorbetto',style:'sorbet',program:'Sorbet',color:'#F8B53C',
+  base:[['mango',340,'very ripe, or Alphonso pulp'],['water',60],['sugar',50],['lime',1]],mix:[],
+  tip:'Canned Alphonso mango pulp is already sweetened; if you use it, drop the sugar to 20 g.'},
+ {id:'roman-raspberry-sorbetto',name:'Roman Raspberry Sorbetto',brand:'Talenti',flavor:'Roman Raspberry Sorbetto',style:'sorbet',program:'Sorbet',color:'#CF3459',
+  base:[['rasp',300],['water',100],['sugar',70],['lemon',1]],mix:[],
+  tip:'Strain out the seeds after blending for a smooth sorbetto. The sugar is what keeps it soft, so keep it in.'},
+
+ /* Jeni's */
+ {id:'brambleberry-crisp',name:'Brambleberry Crisp',brand:"Jeni's",flavor:'Brambleberry Crisp',style:'full',program:'Ice Cream',color:'#F0E4D8',
+  base:SW(70),mix:[['oats',20],['brown',12],['butter',10],['jam',2,'swirl']],swirl:true,
+  prep:['Make the crisp: rub the oats, brown sugar and butter together, bake at 180 °C for 10 minutes until golden, cool and crumble.']},
+
+ /* Salt & Straw */
+ {id:'honey-lavender',name:'Honey Lavender',brand:'Salt & Straw',flavor:'Honey Lavender',style:'full',program:'Ice Cream',color:'#ECE1EC',
+  base:[['milk',230],['cream',170],['honey',4],['sugar',15],['lavender',1,'steeped, then strained'],['salt',1]],mix:[],
+  prep:['Warm the milk with the lavender until steaming, steep 15 minutes, strain, then blend with the rest of the base and chill.'],
+  tip:'Honey is sweeter than sugar and softens the pint more, so this one spins up very smooth.'},
+
+ /* Milk Bar */
+ {id:'cereal-milk',name:'Cereal Milk',brand:'Milk Bar',flavor:'Cereal Milk Soft Serve',style:'full',program:'Ice Cream',color:'#F2E5C6',
+  base:[['milk',300],['cream',100],['cereal',40,'steeped, then strained'],['brown',25],['sugar',30],['salt',1]],mix:[['cereal',15,'toasted with 1 tsp butter']],
+  prep:['Toast the cornflakes at 150 °C for 10 minutes. Soak 40 g in the cold milk for 20 minutes, then strain, pressing gently. Blend the milk with the rest of the base.'],
+  tip:'Nutrition counts the full 40 g of steeping cereal, so the real number is a little lower.'},
+
+ /* Cold Stone */
+ {id:'sweet-cream-pecan-brownie',name:'Sweet Cream Pecan Brownie',brand:'Cold Stone',flavor:"Founder's Favorite",style:'full',program:'Ice Cream',color:'#EFE2C9',
+  base:SW(70),mix:[['pecan',20],['brownie',40],['caramel',1.5,'swirl']],swirl:true},
+
+ /* Oatly */
+ {id:'oat-milk-chocolate',name:'Oat Milk Chocolate',brand:'Oatly',flavor:'Chocolate Frozen Dessert',style:'dairyfree',program:'Ice Cream',color:'#674330',
+  base:[['oat',300],['cocomilk',120],['sugar',70],['cocoa',3],['vanilla',1],['salt',1]],mix:[],prep:[BLOOM.replace('of the milk','of the oat milk')],
+  tip:'Coconut milk brings the fat that cream brings in a dairy pint. A barista oat milk adds more body than a regular one.'},
+
+ /* Pint Lab originals (from the 3-ingredient posts) */
+ {id:'hazelnut-wafer',name:'Hazelnut Wafer',brand:'Pint Lab originals',flavor:'Kinder Bueno',style:'full',program:'Ice Cream',color:'#CDA67D',
+  base:[['milk',230],['cream',120],['nutella',2],['sugar',30],['salt',1]],mix:[['bueno',1,'chopped']],
+  tip:'The viral version blends the bars into milk with no sugar, which spins up icy. A spoon of hazelnut spread and a little sugar fix that.'},
+ {id:'cookie-butter',name:'Cookie Butter',brand:'Pint Lab originals',flavor:'Lotus Biscoff',style:'full',program:'Ice Cream',color:'#C79262',
+  base:[['milk',240],['cream',120],['biscoff',3],['sugar',30],['salt',1]],mix:[['lotus',4,'broken']]},
+ {id:'strawberry-honey-yogurt',name:'Strawberry Honey Yogurt',brand:'Pint Lab originals',flavor:'3-ingredient strawberry',style:'protein',program:'Frozen Yogurt',kind:'froyo',color:'#EFA2B1',
+  base:[['straw',230,'blended'],['milk15',80],['skyr',140],['lcc',1],['wheyV',1],['honey',3]],mix:[],
+  tip:'The viral version is strawberries, milk and honey. Skyr and a scoop of protein turn it into a 40 g protein pint. Honey keeps the fruit from going rock-hard.'},
+ {id:'banana-pb-nice-cream',name:'Banana PB Nice Cream',brand:'Pint Lab originals',flavor:'Banana nice cream',style:'dairyfree',program:'Light Ice Cream',color:'#F0DF9E',
+  base:[['banana',3,'very ripe'],['almondm',90],['pb',2]],mix:[],
+  tip:'Only three ingredients and no added sugar. Very ripe bananas are the sweetener and the thickener.'},
+ {id:'cookies-and-cream-classic',name:'Cookies & Cream Classic',brand:'Pint Lab originals',flavor:'3-ingredient Oreo',style:'full',program:'Ice Cream',color:'#EEEBE6',
+  base:[['milk',250],['cream',100],['sugar',45],['vanilla',1]],mix:[['oreo',7,'crushed']],
+  tip:'The viral version is just milk, cream and cookies. A little sugar in the base keeps it scoopable instead of icy.'},
+ /* ===== Gelato ===== */
+ {id:'pistacchio-gelato',name:'Pistacchio',brand:'Grom',flavor:'Pistacchio',style:'full',program:'Gelato',color:'#C9CF8F',
+  base:[['milk',300],['cream',80],['pistachio',60,'blended very fine, then strained'],['sugar',75],['salt',1]],mix:[],
+  tip:'Gelato is mostly milk with little cream, so the pistachio tastes stronger. Use unsalted, unroasted pistachios for the brightest green.'},
+ {id:'gianduja-gelato',name:'Gianduja',brand:'Venchi',flavor:'Gianduja',style:'full',program:'Gelato',color:'#7A5238',
+  base:[['milk',300],['cream',60],['hazelnut',40,'toasted, blended very fine'],['cocoa',2],['dark',20,'melted into the warm milk'],['sugar',70],['salt',1]],mix:[],prep:[BLOOM]},
+ {id:'bacio-gelato',name:'Bacio',brand:'Perugina',flavor:'Baci chocolate hazelnut',style:'full',program:'Gelato',color:'#5E3B2B',
+  base:[['milk',300],['cream',70],['cocoa',2.5],['nutella',1],['sugar',70],['salt',1]],mix:[['hazelnut',20,'chopped']],prep:[BLOOM]},
+ {id:'tiramisu-gelato',name:'Tiramisù',brand:'Italian gelateria',flavor:'Tiramisù gelato',style:'full',program:'Gelato',color:'#EAD9BF',
+  base:[['milk',250],['mascarpone',100],['sugar',70],['vanilla',1],['salt',1]],mix:[['savoiardi',3,'dipped in the espresso, broken'],['espressoml',30,'cooled, for dipping'],['cocoa',1,'dusted on top']],
+  tip:'Mascarpone works here the way cream cheese does in the cheesecake recipes: it gives body without any gums.'},
+ {id:'amarena-gelato',name:'Amarena',brand:'Fabbri',flavor:'Amarena',style:'full',program:'Gelato',color:'#F5EEE6',
+  base:[['milk',290],['cream',90],['sugar',70],['vanilla',1],['salt',1]],mix:[['vyssino',3,'amarena cherries in syrup or βύσσινο spoon sweet']],swirl:true},
+
+ /* ===== Milkshakes ===== */
+ {id:'protein-chocolate-shake',name:'Protein Chocolate Shake',brand:"McDonald's",flavor:'Chocolate Milkshake',style:'protein',program:'Milk Shake',color:'#8A5A40',
+  base:[['milk15',250],['wheyC',1],['banana',1],['cocoa',1],['allulose',1]],mix:[['milk15',100]],
+  tip:'From the McDonald\'s protein post you shared. The banana makes it thick without any ice cream.'},
+ {id:'protein-vanilla-shake',name:'Protein Vanilla Shake',brand:"McDonald's",flavor:'Vanilla Milkshake',style:'protein',program:'Milk Shake',color:'#F4ECD6',
+  base:[['milk15',250],['wheyV',1],['banana',1],['vanilla',1],['allulose',1]],mix:[['milk15',100]]},
+ {id:'strawberry-shake',name:'Strawberry Shake',brand:"McDonald's",flavor:'Strawberry Milkshake',style:'full',program:'Milk Shake',color:'#F3B6C2',
+  base:[['milk',220],['cream',120],['straw',80,'blended'],['sugar',60],['vanilla',1]],mix:[['milk',120]]},
+ {id:'cookie-shake',name:'Cookie Shake',brand:'Burger King',flavor:'Oreo Shake',style:'full',program:'Milk Shake',color:'#ECE9E4',
+  base:[['milk',220],['cream',150],['sugar',60],['vanilla',1],['salt',1]],mix:[['milk',120],['oreo',3,'crushed']]},
+ {id:'biscoff-shake',name:'Biscoff Shake',brand:'Five Guys',flavor:'Biscoff Milkshake',style:'full',program:'Milk Shake',color:'#C99566',
+  base:[['milk',240],['cream',120],['biscoff',2],['sugar',40],['salt',1]],mix:[['milk',120],['lotus',2,'crushed']]},
+ {id:'pb-banana-protein-shake',name:'PB Banana Protein Shake',brand:'Pint Lab originals',flavor:'Peanut butter banana shake',style:'protein',program:'Milk Shake',color:'#E3C08A',
+  base:[['ufmilk',250],['banana',1],['pb2',3],['wheyV',1]],mix:[['milk15',100]]},
+
+ /* ===== Slushies ===== */
+ {id:'cola-slush',name:'Cola Slush',brand:'7-Eleven',flavor:'Cola Slurpee',style:'sorbet',program:'Slushie',kind:'slushie',fizzy:true,color:'#5A2E1A',
+  base:[['cola',420,'regular, not zero'],['lime',1]],mix:[],
+  tip:'Zero-sugar cola freezes into a solid block that won\'t slush. To use it, stir in 30 g sugar.'},
+ {id:'raspberry-lemon-slush',name:'Raspberry Lemon Slush',brand:'ICEE',flavor:'Blue Raspberry',style:'sorbet',program:'Slushie',kind:'slushie',color:'#C8365A',
+  base:[['water',300],['rasp',100,'blended and strained'],['sugar',70],['lemon',2]],mix:[],
+  tip:'Same sweet-sour flavour as the blue one, without the blue dye.'},
+ {id:'peach-ice-tea-slush',name:'Peach Ice Tea Slush',brand:'Lipton',flavor:'Ice Tea Peach',style:'sorbet',program:'Slushie',kind:'slushie',color:'#E9A35A',
+  base:[['icetea',400],['sugar',20],['lemon',1]],mix:[],
+  tip:'Bottled ice tea is lightly sweetened, so the extra sugar is what makes it slush instead of freezing solid.'},
+ {id:'orange-soda-slush',name:'Orange Soda Slush',brand:'Fanta',flavor:'Fanta Orange',style:'sorbet',program:'Slushie',kind:'slushie',fizzy:true,color:'#F7902A',
+  base:[['orangesoda',380],['oj',40],['sugar',15]],mix:[]},
+ {id:'lemon-lime-slush',name:'Lemon-Lime Slush',brand:'Sprite',flavor:'Sprite',style:'sorbet',program:'Slushie',kind:'slushie',fizzy:true,color:'#E4F2B8',
+  base:[['lemonlime',400],['lime',1],['sugar',15]],mix:[]},
+ {id:'watermelon-slush',name:'Watermelon Slush',brand:'Greek classics',flavor:'Καρπούζι',style:'sorbet',program:'Slushie',kind:'slushie',color:'#F0697A',
+  base:[['watermelon',380,'blended and strained'],['sugar',30],['lime',1]],mix:[],
+  tip:'A few mint leaves blended in with the watermelon make it taste like a Greek beach bar.'},
+
+ /* ===== Italian ice ===== */
+ {id:'cherry-italian-ice',name:'Cherry Italian Ice',brand:"Rita's",flavor:'Cherry Italian Ice',style:'sorbet',program:'Italian Ice',kind:'italian',color:'#B0122F',
+  base:[['cherry',250],['water',150],['sugar',70],['lemon',1]],mix:[]},
+ {id:'mango-italian-ice',name:'Mango Italian Ice',brand:"Rita's",flavor:'Mango Italian Ice',style:'sorbet',program:'Italian Ice',kind:'italian',color:'#F7B23A',
+  base:[['mango',280],['water',120],['sugar',55],['lime',1]],mix:[]},
+ {id:'lemon-granita',name:'Lemon Granita',brand:'Italian gelateria',flavor:'Granita al limone',style:'sorbet',program:'Italian Ice',kind:'italian',color:'#F6F0A8',
+  base:[['lemonml',120],['water',280],['sugar',90],['zest',1]],mix:[]},
+ {id:'coffee-granita',name:'Coffee Granita',brand:'Italian gelateria',flavor:'Granita al caffè',style:'sorbet',program:'Italian Ice',kind:'italian',color:'#4A2C1E',
+  base:[['espressoml',300,'cooled'],['water',80],['sugar',60]],mix:[],
+  tip:'Sicilians top it with whipped cream and eat it with a brioche.'},
+ {id:'sour-cherry-granita',name:'Sour Cherry Granita',brand:'Greek classics',flavor:'Γρανίτα βύσσινο',style:'sorbet',program:'Italian Ice',kind:'italian',color:'#8E1530',
+  base:[['vyssino',5,'with its syrup'],['water',300],['sugar',20],['lemon',1]],mix:[]},
+ {id:'almond-granita',name:'Almond Granita',brand:'Italian gelateria',flavor:'Granita di mandorla',style:'sorbet',program:'Italian Ice',kind:'italian',color:'#F3ECDD',
+  base:[['almondm',380],['almond',15,'blended in'],['sugar',70]],mix:[]},
+
+ /* ===== Frozen drinks ===== */
+ {id:'caramel-frappe',name:'Caramel Frappé',brand:'Starbucks',flavor:'Caramel Frappuccino',style:'full',program:'Frozen Drink',kind:'drink',color:'#C8A07A',
+  base:[['espressoml',90,'cooled'],['milk',250],['caramel',2],['sugar',30]],mix:[['caramel',1,'drizzle on top']],
+  tip:'The coffee-shop version uses a syrup base with xanthan gum. Spinning a frozen tub gives the same thick texture without it.'},
+ {id:'strawberry-creme-frappe',name:'Strawberry Crème Frappé',brand:'Starbucks',flavor:'Strawberry Crème Frappuccino',style:'full',program:'Frozen Drink',kind:'drink',color:'#F4B9C4',
+  base:[['milk',250],['cream',50],['straw',120,'blended'],['sugar',45],['vanilla',1]],mix:[]},
+ {id:'frozen-freddo-cappuccino',name:'Frozen Freddo Cappuccino',brand:'Greek classics',flavor:'Freddo cappuccino',style:'full',program:'Frozen Drink',kind:'drink',color:'#BC9473',
+  base:[['espressoml',120,'cooled'],['milk15',250],['sugar',25]],mix:[],
+  tip:'Top with cold foamed milk (αφρόγαλα) like a real freddo.'},
+ {id:'frozen-lemonade',name:'Frozen Lemonade',brand:'Chick-fil-A',flavor:'Frozen Lemonade',style:'full',program:'Frozen Drink',kind:'drink',color:'#FAF2C6',
+  base:[['lemonml',90],['water',120],['sugar',70],['milk',150],['cream',40]],mix:[],
+  tip:'Mix the lemon, water and sugar first, then stir in the milk slowly so it doesn\'t curdle.'},
+ {id:'virgin-pina-colada',name:'Virgin Piña Colada',brand:'Pint Lab originals',flavor:'Virgin piña colada',style:'dairyfree',program:'Frozen Drink',kind:'drink',color:'#F6EBC2',
+  base:[['pinej',250],['cococream',80],['pine',80],['lime',1],['sugar',15]],mix:[]},
+ {id:'frozen-hot-chocolate',name:'Frozen Hot Chocolate',brand:'Serendipity 3',flavor:'Frozen Hot Chocolate',style:'full',program:'Frozen Drink',kind:'drink',color:'#6B4232',
+  base:[['chocmilk',300],['milk',80],['cocoa',2],['dark',30,'melted into the warm milk'],['sugar',30]],mix:[],prep:[BLOOM]},
+ /* ===== Frozen yogurt ===== */
+ {id:'original-tart-froyo',name:'Original Tart',brand:'Pinkberry',flavor:'Original frozen yogurt',style:'protein',program:'Frozen Yogurt',kind:'froyo',color:'#FBFAF5',
+  base:[['skyr',300],['milk15',100],['sugar',55],['lemon',1],['salt',1]],mix:[['straw',40,'fresh, on top'],['blue',30,'on top']],
+  tip:'The tang is the point, so don\'t over-sweeten. Top with fresh fruit after spinning rather than mixing it in.'},
+ {id:'mango-tart-froyo',name:'Mango Tart',brand:'Yogurtland',flavor:'Mango Tart',style:'protein',program:'Frozen Yogurt',kind:'froyo',color:'#F9D27A',
+  base:[['skyr',220],['mango',150,'blended'],['milk15',60],['sugar',45],['lime',1]],mix:[]},
+ /* ===== Greek slushies ===== */
+ {id:'lemonada-slush',name:'Lemonada Slush',brand:'Loux',flavor:'Λεμονάδα',style:'sorbet',program:'Slushie',kind:'slushie',fizzy:true,color:'#F5F2B5',
+  base:[['lemonade',400],['lemon',1],['sugar',10]],mix:[]},
+ {id:'portokalada-slush',name:'Portokalada Slush',brand:'Epsa',flavor:'Πορτοκαλάδα',style:'sorbet',program:'Slushie',kind:'slushie',fizzy:true,color:'#F6A23C',
+  base:[['orangesoda',380],['oj',40,'fresh'],['sugar',10]],mix:[]},
+ {id:'vyssinada-slush',name:'Vyssinada Slush',brand:'Greek classics',flavor:'Βυσσινάδα',style:'sorbet',program:'Slushie',kind:'slushie',color:'#9A1B36',
+  base:[['vyssino',4,'with its syrup'],['water',320],['lemon',1],['sugar',15]],mix:[],
+  tip:'Blend the spoon sweet with the water so the cherries break down, then strain if you like it smooth.'},
+ {id:'soumada-slush',name:'Soumada Slush',brand:'Greek classics',flavor:'Σουμάδα',style:'sorbet',program:'Slushie',kind:'slushie',color:'#F6F1E6',
+  base:[['almondm',300],['almond',20,'blended in, then strained'],['sugar',55],['water',60],['rosewater',0.25]],mix:[],
+  tip:'Soumada is the Cretan almond drink. A drop of almond extract makes it taste like the bottled syrup.'},
+ {id:'mountain-tea-slush',name:'Mountain Tea Honey Slush',brand:'Greek classics',flavor:'Τσάι του βουνού με μέλι',style:'sorbet',program:'Slushie',kind:'slushie',color:'#D9C27A',
+  base:[['mountaintea',360],['honey',3],['lemon',2],['sugar',10]],mix:[]},
+ {id:'kumquat-slush',name:'Kumquat Slush',brand:'Greek classics',flavor:'Κουμκουάτ Κέρκυρας',style:'sorbet',program:'Slushie',kind:'slushie',color:'#F7A21A',
+  base:[['kumquat',150,'blended and strained'],['water',250],['sugar',60],['lemon',1]],mix:[]},
+ {id:'mastiha-lemon-slush',name:'Mastiha Lemon Slush',brand:'Greek classics',flavor:'Μαστίχα λεμονάδα',style:'sorbet',program:'Slushie',kind:'slushie',color:'#F4F3D8',
+  base:[['lemonml',90],['water',300],['sugar',70],['mastic',0.25,'ground with 1 tsp of the sugar']],mix:[]},
+ {id:'freddo-espresso-slush',name:'Freddo Espresso Slush',brand:'Greek classics',flavor:'Freddo espresso',style:'sorbet',program:'Slushie',kind:'slushie',color:'#3C2418',
+  base:[['espressoml',300,'cooled'],['water',100],['sugar',40]],mix:[],
+  tip:'This is "metrio" with 40 g sugar. Even "sketo" needs at least 20 g to slush.'},
+];
+
+/* sugar per 100 g (includes natural milk and fruit sugars; allulose and stevia count as 0) */
+const SUGAR={milk:4.8,milk15:4.8,ufmilk:2.5,cream:2.8,greek:3.6,greek5:4,greek2:4,skyr:4,cc:3,lcc:4,ccg:3,lccg:4,wheyV:4,wheyC:4,sugar:100,brown:97,honey:82,allulose:0,stevia:0,cocoa:1.8,vanilla:13,salt:0,espresso:0,mint:0,malt:50,pb:6,pb2:10,biscoff:38,nutella:57,dulce:50,caramel:60,sfcaramel:0,sfchoc:0,fudge:50,fluff:58,jam:55,banana:12,straw:4.9,rasp:4.4,blue:10,cherry:13,mango:14,pine:10,lemon:2.5,lime:1.7,water:0,cocomilk:2,lcoco:1,oat:3.3,almondm:0,lavender:0,spinach:0.4,cereal:9,butter:0,oats:1,oreo:38,chips:55,minichips:55,dark:24,white:59,dough:40,brownie:40,graham:25,pretzel:3,toffee:60,almond:4,pecan:4,walnut:2.6,pistachio:7.7,lotus:38,pbcup:47,bueno:41,candy:65,sprinkles:75,cake:35,cone:25,beans:45,crunchbar:48,hazelnut:4.3,wafer:45,vyssino:65,peach:8.4,mastic:0,cinnamon:0,instcoffee:0,cocooil:0,phyllo:2,condensed:54,chocmilk:10,oj:8.4,lemonml:2.5,zest:0,passion:11,mascarpone:3.5,savoiardi:40,espressoml:0,cola:10.6,orangesoda:9.8,lemonlime:9,icetea:4.6,watermelon:6.2,pinej:10,cococream:3.3,loukoumas:8,tahini:0.5,halva:48,kataifi:3,tsoureki:18,melomakarono:30,kourabies:30,mahlab:0,rosewater:0,clove:0,orangezest:0,vanilia:97,rice:0,sesame:0.3,pasteli:40,figs:48,petitbeurre:22,revani:35,karidopita:35,sponge:35,choux:5,coconut:7,blondie:38,crisps:0.5,pumpkin:3.3,oatcookie:30,cookie:35,milkchoc:51,caprice:40,diples:25,sokolatopita:40,petimezi:70,loukoumi:70,lemonade:10,kumquat:9.4,mountaintea:0};
+/* ---------- Helpers ---------- */
+const STYLE = {full:'Full cream',protein:'Protein',dairyfree:'Dairy-free',sorbet:'Sorbet'};
+const KIND = {icecream:'Ice cream & sorbet',gelato:'Gelato',froyo:'Frozen yogurt',milkshake:'Milkshakes',slushie:'Slushies',italian:'Italian ice',drink:'Frozen drinks'};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const FR = {0.25:'¼',0.5:'½',0.75:'¾'};
+function fmtQty(q,unit){
+  if(unit==='pinch'||unit==='drop'||(unit===''&&q>=1.5)) return String(Math.max(1,Math.round(q)));
+  if(unit==='g'||unit==='ml'){ return String(q>=20?Math.round(q/5)*5:Math.round(q)); }
+  const r=Math.round(q*4)/4, w=Math.floor(r), f=r-w;
+  return (w||!f?String(w||''):'')+(FR[f]||'') || '0';
+}
+function line(item,mult){
+  const [key,q0,note]=item, ing=I[key], q=q0*mult;
+  const [n,u]=ing, unit=u;
+  const qs=fmtQty(q,unit);
+  const plural = (unit==='pinch'||unit==='drop')?Math.round(q)>1:q>1.01;
+  let name = Array.isArray(n)?(plural?n[1]:n[0]):n;
+  let uLabel = unit==='drop'?(plural?'drops':'drop'):unit==='pinch'?(plural?'pinches':'pinch'):unit==='scoop'?(plural?'scoops':'scoop'):unit;
+  return {q: uLabel?`${qs} ${uLabel}`:qs, name, note};
+}
+function nutrition(r){
+  const t={k:0,p:0,f:0,c:0,s:0};
+  for(const [key,q] of [...r.base,...r.mix]){ const i=I[key], g=q*i[2]; t.k+=g*i[3]/100; t.p+=g*i[4]/100; t.f+=g*i[5]/100; t.c+=g*i[6]/100; t.s+=g*(SUGAR[key]||0)/100; }
+  return t;
+}
+const COUNTLESS = new Set(['salt','water']);
+function ingCount(r){ return new Set([...r.base,...r.mix].map(x=>x[0]).filter(k=>!COUNTLESS.has(k))).size; }
+R.forEach(r=>{ r.kind=r.kind||(r.program==='Gelato'?'gelato':r.program==='Milk Shake'?'milkshake':'icecream'); r.cc=r.base.some(x=>['cc','lcc','ccg'].includes(x[0])); r.nut=nutrition(r); r.n=ingCount(r); r.search=(r.name+' '+r.brand+' '+r.flavor+' '+STYLE[r.style]+' '+KIND[r.kind]+' '+r.program+' '+[...r.base,...r.mix].map(x=>{const n=I[x[0]][0];return Array.isArray(n)?n[1]:n}).join(' ')).toLowerCase(); });
+
+
+/* ---------- Lean (cutting) version of every recipe ---------- */
+const BASE_ML=473;
+const HALVE=new Set(['blondie','crisps','oatcookie','cookie','coconut','milkchoc','caprice','diples','sokolatopita','pasteli','karidopita','revani','sponge','choux','petitbeurre','loukoumas','halva','kataifi','tsoureki','melomakarono','kourabies','white','hazelnut','wafer','dark','chips','minichips','dough','brownie','pbcup','candy','toffee','cake','lotus','crunchbar','beans','walnut','pecan','almond','pistachio']);
+const r2=x=>Math.round(x*2)/2;
+function leanOf(r){
+  if(r.style==='protein'||r.style==='sorbet') return {...r,lean:true,leanSame:true};
+  const has=k=>r.base.some(x=>x[0]===k), choc=has('cocoa');
+  let L=0, allu=0, hasYog=false, hasCC=false; const rest=[];
+  for(const [k,q,n] of r.base){
+    if(k==='milk'||k==='cream'||k==='milk15'){ L+=q; continue; }
+    if(k==='sugar'||k==='brown'){ allu+=q; continue; }
+    if(k==='oat'){ rest.push(['almondm',q,n]); continue; }
+    if(k==='cocomilk'||k==='cococream'){ rest.push(['lcoco',k==='cococream'?q*1.5:q,n]); continue; }
+    if(k==='mascarpone'){ rest.push(['lccg',Math.round(q*0.7/5)*5]); hasCC=true; continue; }
+    if(k==='honey'){ rest.push(['honey',Math.min(q,1)]); if(q>1) allu+=(q-1)*21; continue; }
+    if(k==='malt'){ rest.push(['malt',Math.min(q,1.5)]); continue; }
+    if(k==='dulce'||k==='caramel'){ rest.push(['sfcaramel',q]); continue; }
+    if(k==='pb'){ rest.push(['pb2',Math.min(4,r2(q*1.5)),'instead of peanut butter']); continue; }
+    if(k==='nutella'||k==='biscoff'){ rest.push([k,1]); continue; }
+    if(k==='vanilia'){ rest.push([k,1,'for the flavour']); allu+=Math.max(0,q-1)*20; continue; }
+    if(k==='milkchoc'){ rest.push([k,Math.round(q/2),n]); continue; }
+    if(k==='petimezi'){ rest.push([k,r2(q/2)]); allu+=r2(q/2)*20; continue; }
+    if(k==='sesame'){ rest.push([k,Math.round(q/2),n]); continue; }
+    if(k==='tahini'){ rest.push([k,Math.max(1,r2(q/2))]); continue; }
+    if(k==='pistachio'||k==='dark'||k==='hazelnut'){ rest.push([k,Math.round(q*(k==='dark'?0.5:0.4)),n]); continue; }
+    if(k==='greek5'||k==='greek2'){ rest.push(['greek',q]); hasYog=true; continue; }
+    if(k==='condensed'){ allu+=q*0.55; L+=q*0.45; continue; }
+    if(k==='ccg'){ rest.push(['lccg',Math.round(q*0.6/5)*5]); hasCC=true; continue; }
+    if(k==='cc'){ rest.push(['lcc',q]); hasCC=true; continue; }
+    rest.push([k,q,n]);
+  }
+  const front=[];
+  if(L>0){
+    front.push(['ufmilk',L<200?L:Math.max(150,L-(hasYog?0:110)-30)]);
+    const drinky=r.kind==='milkshake'||r.kind==='drink';
+    if(drinky) front[0][1]=L;
+    if(!hasYog&&!drinky) front.push(['skyr',120]);
+    if(!hasCC&&!drinky) front.push(['lcc',1]);
+    front.push([choc?'wheyC':'wheyV',1]);
+  }
+  if(allu) rest.splice(0,0,['allulose',Math.min(5,Math.max(1,r2(allu/14)))]);
+  const mix=[];
+  for(const [k,q,n] of r.mix){
+    if(k==='butter'||k==='cocooil') continue;
+    if(k==='dulce'||k==='caramel') mix.push(['sfcaramel',q,n]);
+    else if(k==='fudge') mix.push(['sfchoc',q,n]);
+    else if(k==='ccg') mix.push(['lccg',q,n]);
+    else if(k==='nutella'||k==='biscoff') mix.push([k,1,n]);
+    else if(k==='honey'||k==='vanilia') mix.push([k,Math.min(q,0.5),n]);
+    else if(k==='pb') mix.push(['pb2',q*2,'mixed with a little water']);
+    else if(k==='brown'||k==='sugar') mix.push(['allulose',1]);
+    else if(k==='milk'||k==='milk15') mix.push(['ufmilk',q]);
+    else if(k==='oreo') mix.push([k,Math.max(2,Math.ceil(q/2)),n]);
+    else if(k==='bueno') mix.push([k,0.5,n]);
+    else if(HALVE.has(k)) mix.push([k,I[k][1]==='g'?Math.max(8,Math.round(q/2)):Math.max(1,Math.ceil(q/2)),n]);
+    else mix.push([k,q,n]);
+  }
+  const out={...r,base:[...front,...rest],mix,lean:true,program:['Ice Cream','Gelato'].includes(r.program)?'Light Ice Cream':r.program};
+  out.cc=out.base.some(x=>['cc','lcc','ccg','lccg'].includes(x[0]));
+  out.nut=nutrition(out); out.n=ingCount(out);
+  return out;
+}
+R.forEach(r=>{ r.L=leanOf(r); });
+
+/* seeded random */
+function rng(seed){ let h=2166136261; for(const c of seed) h=Math.imul(h^c.charCodeAt(0),16777619); return ()=>{ h+=0x6D2B79F5; let t=h; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
+const MULTI=['#E4322B','#F5B921','#2F7FD8','#3BA64A','#F07A1A','#8B4BC4'];
+function lum(hex){ const n=parseInt(hex.slice(1),16); return (0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255; }
+/* Top-down pint: base colour, swirl ribbons for sauces, flecks for solid mix-ins */
+function pintSVG(r,size){
+  const rand=rng(r.id), id='g'+r.id.replace(/[^a-z0-9]/g,'');
+  const dark=lum(r.color)<0.45;
+  let marks='';
+  for(const [key,q] of r.mix){
+    const ing=I[key], col=ing[7]; if(!col) continue;
+    const isSauce=['caramel','sfcaramel','fudge','sfchoc','fluff','jam','dulce','pb','pb2'].includes(key) && r.swirl;
+    if(isSauce){
+      const a=rand()*6.28, rr=16+rand()*10;
+      let d=''; for(let s=0;s<=26;s++){ const th=a+s*0.32, rad=rr*(1-s/40)+Math.sin(s*.7)*2; d+=(s?'L':'M')+(50+Math.cos(th)*rad).toFixed(1)+' '+(50+Math.sin(th)*rad).toFixed(1); }
+      marks+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="${3+rand()*2}" stroke-linecap="round" opacity=".85"/>`;
+      continue;
+    }
+    const n = Math.min(16, 5+Math.round(q*ing[2]/6));
+    for(let k=0;k<n;k++){
+      const ang=rand()*6.28, rad=Math.sqrt(rand())*36, x=50+Math.cos(ang)*rad, y=50+Math.sin(ang)*rad;
+      const c = col==='multi'?MULTI[Math.floor(rand()*MULTI.length)]:col;
+      const s = key==='sprinkles'?[1.2,4]:(key==='candy'?[3,3]:[2+rand()*3,2+rand()*3]);
+      const rot=(rand()*180).toFixed(0);
+      marks+= key==='candy' ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="${c}"/>`
+        : `<rect x="${(x-s[0]/2).toFixed(1)}" y="${(y-s[1]/2).toFixed(1)}" width="${s[0].toFixed(1)}" height="${s[1].toFixed(1)}" rx="${key==='sprinkles'?0.6:1}" fill="${c}" transform="rotate(${rot} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    }
+  }
+  /* soft texture ridges from the Creami blade */
+  let ridges=''; for(let k=0;k<3;k++){ const rr=12+k*10+rand()*3; ridges+=`<circle cx="50" cy="50" r="${rr.toFixed(1)}" fill="none" stroke="${dark?'#fff':'#000'}" stroke-opacity=".06" stroke-width="2.5"/>`; }
+  return `<svg class="pint" viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true">
+    <defs><radialGradient id="${id}" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></radialGradient>
+    <clipPath id="c${id}"><circle cx="50" cy="50" r="42"/></clipPath></defs>
+    <circle cx="50" cy="50" r="48" fill="#C9D3DC"/><circle cx="50" cy="50" r="46" fill="#F4F7F9"/>
+    <circle cx="50" cy="50" r="42" fill="${r.color}"/>
+    <g clip-path="url(#c${id})">${ridges}${marks}</g>
+    <circle cx="50" cy="50" r="42" fill="url(#${id})"/>
+  </svg>`;
+}
+
+/* ---------- State ---------- */
+let favs=new Set();
+try{ favs=new Set(JSON.parse(localStorage.getItem('pintlab-favs')||'[]')); }catch(e){}
+const saveFavs=()=>{ try{ localStorage.setItem('pintlab-favs',JSON.stringify([...favs])); }catch(e){} };
+const load=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}};
+const store=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
+const state={quick:new Set(),kind:'all',sweet:load('pintlab-sweet','allulose'),yog:load('pintlab-yog','skyr'),q:'',style:'all',brand:'all',sort:'brand',favOnly:false,noCC:false,lean:load('pintlab-lean','0')==='1',ml:+load('pintlab-ml2','450')||450};
+const BRANDS=[...new Set(R.map(r=>r.brand))];
+
+/* ---------- Filters UI ---------- */
+function renderKinds(){
+  const opts=[['all','Everything',R.length],...Object.entries(KIND).map(([k,l])=>[k,l,R.filter(r=>r.kind===k).length])];
+  $('#kinds').innerHTML=opts.map(([k,l,n])=>`<button type="button" data-kind="${k}" aria-pressed="${state.kind===k}">${l}<small>${n}</small></button>`).join('');
+}
+$('#kinds').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.kind=b.dataset.kind;renderKinds();render();});
+function renderStyles(){
+  const opts=[['all','All'],...Object.entries(STYLE)];
+  $('#styles').innerHTML=opts.map(([k,l])=>`<button type="button" data-style="${k}" aria-pressed="${state.style===k}">${l}</button>`).join('');
+}
+function renderBrands(){
+  const opts=[['all','All brands',R.length],...BRANDS.map(b=>[b,b,R.filter(r=>r.brand===b).length])];
+  $('#brands').innerHTML=opts.map(([k,l,n])=>`<button type="button" data-brand="${esc(k)}" aria-pressed="${state.brand===k}">${esc(l)}<small>${n}</small></button>`).join('');
+}
+$('#styles').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.style=b.dataset.style;renderStyles();render();});
+$('#brands').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.brand=b.dataset.brand;renderBrands();render();});
+$('#q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();render();});
+$('#sort').addEventListener('change',e=>{state.sort=e.target.value;render();});
+$('#ccBtn').addEventListener('click',()=>{state.noCC=!state.noCC;$('#ccBtn').setAttribute('aria-checked',state.noCC);render();});
+$('#favBtn').addEventListener('click',()=>{state.favOnly=!state.favOnly;$('#favBtn').setAttribute('aria-pressed',state.favOnly);render();});
+
+const SWAPCACHE=new Map();
+function pantry(r){
+  if(state.sweet==='allulose'&&state.yog==='skyr') return r;
+  const key=r.id+(r.lean?'L':'')+state.sweet+state.yog;
+  if(SWAPCACHE.has(key)) return SWAPCACHE.get(key);
+  const sw=([k,q,n])=> k==='allulose'&&state.sweet==='stevia' ? ['stevia',Math.max(3,Math.round(q*5)),'taste and adjust; brands vary']
+                    : k==='skyr'&&state.yog==='greek' ? ['greek',q,n] : [k,q,n];
+  const out={...r,base:r.base.map(sw),mix:r.mix.map(sw)};
+  out.nut=nutrition(out); out.n=ingCount(out); out.stevia=out.base.some(x=>x[0]==='stevia');
+  SWAPCACHE.set(key,out); return out;
+}
+function view(r){ return pantry(state.lean ? r.L : r); }
+const F = () => state.ml/BASE_ML;
+function filtered(){
+  let list=R.filter(r=>(state.kind==='all'||r.kind===state.kind)&&(state.style==='all'||r.style===state.style)&&(state.brand==='all'||r.brand===state.brand)&&(!state.favOnly||favs.has(r.id))&&(!state.noCC||!view(r).cc)&&quickOK(r)&&(!state.q||state.q.split(/\s+/).every(w=>r.search.includes(w))));
+  const s=state.sort, N=r=>view(r).nut;
+  if(s==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(s==='protein') list.sort((a,b)=>N(b).p-N(a).p);
+  if(s==='kcal') list.sort((a,b)=>N(a).k-N(b).k);
+  if(s==='fat') list.sort((a,b)=>N(a).f-N(b).f);
+  if(s==='sugar') list.sort((a,b)=>N(a).s-N(b).s);
+  if(s==='few') list.sort((a,b)=>view(a).n-view(b).n||N(a).k-N(b).k);
+  return list;
+}
+const heart='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4h2c.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>';
+const heartO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.3-9-8.6C1.6 8.3 3.5 5 6.8 5c2 0 3.4 1.1 4.1 2.3h2.2C13.8 6.1 15.2 5 17.2 5c3.3 0 5.2 3.3 3.8 6.4C19 15.7 12 20 12 20z"/></svg>';
+
+function card(r0){
+  const r=view(r0), f=F();
+  const items=[...r.base.filter(x=>!COUNTLESS.has(x[0])&&x[0]!=='vanilla'),...r.mix].map(x=>{const n=I[x[0]][0];return Array.isArray(n)?n[1]:n.split(/[,(]/)[0].trim();});
+  const uniq=[...new Set(items)];
+  const leanChip = state.lean ? (r.leanSame?'<span class="chip prog">Already lean</span>':'<span class="chip lean">Lean version</span>') : '';
+  return `<article class="card" data-id="${r.id}">
+    <button class="fav" type="button" data-fav="${r.id}" aria-pressed="${favs.has(r.id)}" aria-label="Save ${esc(r.name)}">${favs.has(r.id)?heart:heartO}</button>
+    <div class="lid">${pintSVG(r,78)}<div class="ttl"><h3><button class="open" type="button">${esc(r.name)}</button></h3><div class="insp">Inspired by ${esc(r.brand)} ${esc(r.flavor)}</div></div></div>
+    <div class="chips">${freezeChip(r.id)}${(log[r.id]&&log[r.id].n)?`<span class="chip made">Made ×${log[r.id].n}</span>`:''}${leanChip}${state.lean&&!r.leanSame?'':`<span class="chip ${r.style}">${STYLE[r.style]}</span>`}<span class="chip prog">${r.program}</span>${r.cc?'<span class="chip prog">Cream cheese</span>':''}</div>
+    <p class="ings">${esc(uniq.join(' · '))}</p>
+    <div class="macros"><span><b>${Math.round(r.nut.k*f)}</b>kcal</span><span><b>${Math.round(r.nut.p*f)} g</b>protein</span><span><b>${Math.round(r.nut.f*f)} g</b>fat</span><span><b>${Math.round(r.nut.s*f)} g</b>sugar</span></div>
+  </article>`;
+}
+function render(){
+  const list=filtered();
+  $('#favCount').textContent=favs.size;
+  if(typeof setupSummary==='function') setupSummary();
+  const sn=document.getElementById('showN'); if(sn) sn.textContent=list.length?`Show ${list.length} recipes`:'No matches';
+  $('#count').textContent=`${state.kind==='all'?'':KIND[state.kind]+' · '}${list.length} of ${R.length} recipes${state.lean?' · lean':''}`;
+  renderShelf(); renderActive();
+  const grouped=state.sort==='brand'&&state.brand==='all'&&!state.q&&list.length>8;
+  let html='',last=null; if(grouped){ for(const r of list){ if(r.brand!==last){ last=r.brand; html+=`<div class="ghead"><h2>${esc(r.brand)}</h2><span>${list.filter(x=>x.brand===r.brand).length}</span></div>`; } html+=card(r); } }
+  $('#grid').innerHTML=list.length?(grouped?html:list.map(card).join('')):
+    `<div class="empty" style="grid-column:1/-1">${state.favOnly&&!favs.size?'No saved recipes yet. Tap the heart on any pint to keep it here.':'No recipes match these filters.'}<br><button class="btn" type="button" id="reset">Clear filters</button></div>`;
+}
+$('#grid').addEventListener('click',e=>{
+  if(e.target.closest('#reset')){Object.assign(state,{q:'',style:'all',brand:'all',kind:'all',favOnly:false,noCC:false});state.quick.clear();renderQuick();renderKinds();$('#ccBtn').setAttribute('aria-checked','false');$('#q').value='';$('#favBtn').setAttribute('aria-pressed','false');renderStyles();renderBrands();render();return;}
+  const f=e.target.closest('[data-fav]'); if(f){ toggleFav(f.dataset.fav); return; }
+  const c=e.target.closest('.card'); if(c) location.hash='r-'+c.dataset.id;
+});
+
+function toggleFav(id){ favs.has(id)?favs.delete(id):favs.add(id); saveFavs(); render(); if(dlg.open&&cur) openRecipe(cur); }
+
+/* ---------- Detail ---------- */
+const dlg=$('#dlg'); let cur=null;
+function steps(r){
+  const s=[...(r.prep||[])];
+  if(r.cc) s.unshift('Soften the cream cheese (10 seconds in the microwave) and blend it with the sugar or sweetener first, then add the liquids. This stops white flecks in the tub.');
+  if(r.lean&&!r.leanSame&&r.base.some(x=>x[0]==='wheyV'||x[0]==='wheyC')) s.push('Blend the protein powder in last, on low, so the base doesn\'t foam up past the max fill line.');
+  if(r.fizzy) s.push('Pour the drink slowly and let the bubbles settle for 10 minutes. Stir the other ingredients in gently; don\'t blend a fizzy drink or it will foam over.');
+  else s.push(r.style==='sorbet'?'Blend the base until completely smooth, 30 to 60 seconds. It should taste a little too sweet at room temperature; cold dulls sweetness.'
+    :'Blend the base until completely smooth and the sweetener has dissolved, 30 to 60 seconds. An immersion blender in a jug works well.');
+  s.push('Pour into your tub up to the MAX FILL line. Lid on, and freeze on a level shelf for a full 24 hours.');
+  const lean = r.style==='protein'||(r.lean&&!r.leanSame);
+  const rest=r.stevia?'15 minutes':lean?'10 minutes':'5 minutes';
+  if(r.stevia) s.push('Stevia sweetens but, unlike sugar or allulose, it doesn\'t keep the tub soft, so it will freeze firmer. Plan on two re-spins. Optional: blend in 1 tbsp honey, which softens it noticeably for about 60 kcal and no fat.');
+  const splash=r.style==='sorbet'?'1 tbsp water or juice':r.style==='dairyfree'?'1 tbsp plant milk':'1 tbsp milk';
+  const MIXIN='MIX-IN';
+  if(r.program==='Milk Shake'){
+    s.push(`Let the tub sit for ${rest}. Make a 4 cm well down the centre to the bottom, pour in the milk${r.mix.length>1?' and the mix-ins':''}, and run MILK SHAKE.`);
+  } else if(r.program==='Slushie'){
+    s.push('Let the tub sit for 5 minutes, then run SLUSHIE.');
+    s.push('If it is too thick to sip, add 2 to 3 tbsp of the cold drink and press RE-SPIN. Serve straight away with a straw; slush melts fast.');
+  } else if(r.program==='Italian Ice'){
+    s.push('Let the tub sit for 5 minutes, then run ITALIAN ICE.');
+    s.push('If it looks crumbly, add 1 tbsp water or juice and press RE-SPIN. It should be fine-grained and spoonable, a little firmer than sorbet.');
+  } else if(r.program==='Frozen Drink'){
+    s.push(`Let the tub sit for ${rest}, then run FROZEN DRINK.`);
+    s.push('Pour into a glass. If it is too thick to sip, stir in a splash of milk or juice.' + (r.mix.length?' Add the toppings last.':''));
+  } else {
+    s.push(`Let the tub sit on the counter for ${rest}, then run ${r.program.toUpperCase()}.`);
+    s.push(`If it looks powdery or crumbly, add ${splash} and press RE-SPIN. ${lean?'Lean tubs often need two re-spins. ':'Repeat once if needed. '}This step does the job gums and pudding mix usually do.`);
+    if(r.mix.length) s.push(`Make a 4 cm well down the centre to the bottom, add the mix-ins${r.swirl?' (sauces last, drizzled in a spiral)':''}, and run ${MIXIN}.`);
+  }
+  return s;
+}
+function splitBar(n){ const p=n.p*4,f=n.f*9,c=n.c*4,t=p+f+c||1; const pc=x=>Math.round(x/t*100);
+  return `<div class="split" role="img" aria-label="Calories: ${pc(p)}% protein, ${pc(f)}% fat, ${pc(c)}% carbs"><i class="p" style="width:${p/t*100}%"></i><i class="f" style="width:${f/t*100}%"></i><i class="c" style="width:${c/t*100}%"></i></div><div class="legend"><span><i style="background:var(--protein)"></i>Protein ${pc(p)}%</span><span><i style="background:var(--cream)"></i>Fat ${pc(f)}%</span><span><i style="background:var(--dairyfree)"></i>Carbs ${pc(c)}%</span></div>`; }
+function savesLine(r0,m){ const o=pantry(r0).nut,l=pantry(r0.L).nut; const d=k=>Math.round((o[k]-l[k])*m);
+  return `<p class="saves">${state.lean?'This lean version saves':'The lean version would save'} <b>${d('k')} kcal</b>, <b>${d('f')} g fat</b> and <b>${d('s')} g sugar</b> per tub.</p>`; }
+function openRecipe(r0){
+  cur=r0; const r=view(r0), m=F(), nut=r.nut;
+  const li=x=>{const l=line(x,m);return `<li><span class="q">${esc(l.q)}</span><span class="n">${esc(l.name)}${l.note?` <small>· ${esc(l.note)}</small>`:''}</span></li>`;};
+  const mixLabel=r.program==='Milk Shake'?'Add when spinning':r.kind==='drink'?'Toppings':'Mix-ins';
+  const nrow=(lab,d,n=nut)=>`<tr><td>${lab}</td><td>${Math.round(n.k*m/d)}</td><td>${Math.round(n.p*m/d)}</td><td>${Math.round(n.f*m/d)}</td><td>${Math.round(n.c*m/d)}</td><td>${Math.round(n.s*m/d)}</td></tr>`;
+  const other = state.lean ? r0 : r0.L;
+  const ae=dlg.open&&dlg.contains(document.activeElement)?document.activeElement:null;
+  const keep=ae?(ae.dataset.lean!==undefined?'[data-lean][aria-pressed="true"]':ae.dataset.fav!==undefined?'.dactions [data-fav]':ae.id?'#'+ae.id:null):null;
+  dlg.innerHTML=`
+   <div class="dhead">${pintSVG(r,120)}<div class="ttl">
+     <h2 id="dTitle">${esc(r.name)}${state.lean&&!r.leanSame?' <span class="leantag">Lean</span>':''}</h2>
+     <div class="insp" style="font-size:14px;margin-top:6px">Inspired by ${esc(r.brand)} ${esc(r.flavor)}</div>
+     <div class="chips" style="margin-top:10px">${state.lean&&!r.leanSame?'<span class="chip lean">Lean version</span>':`<span class="chip ${r.style}">${STYLE[r.style]}</span>`}<span class="chip prog">${r.program}</span><span class="chip prog">${r.n} ingredients</span></div>
+   </div><button class="close" type="button" aria-label="Close" data-close>×</button></div>
+   <div class="dbody">
+     <div>
+       <div class="sizebar">
+         <div class="seg" role="group" aria-label="Version"><button type="button" data-lean="0" aria-pressed="${!state.lean}">Original</button><button type="button" data-lean="1" aria-pressed="${state.lean}">Lean (low fat)</button></div>
+         <span class="note">Scaled to a ${state.ml} ml tub</span></div>
+       ${state.lean&&r.leanSame?`<p class="note" style="margin:-4px 0 12px">This one is already a lean recipe, so both versions are the same.</p>`:''}
+       <h3>Base</h3>
+       <ul class="ilist">${r.base.map(li).join('')}</ul>
+       ${r.mix.length?`<h3>${mixLabel}</h3><ul class="ilist">${r.mix.map(li).join('')}</ul>`:''}
+       <h3>Nutrition, estimated</h3>
+       ${splitBar(nut)}${r.leanSame?'':savesLine(r0,m)}
+       <table class="nut"><thead><tr><td></td><th>kcal</th><th>protein g</th><th>fat g</th><th>carbs g</th><th>sugar g</th></tr></thead>
+       <tbody>${nrow('Whole tub',1)}${nrow('Per serving (⅓)',3)}${r.leanSame?'':nrow(state.lean?'Original, whole tub':'Lean, whole tub',1,other.nut)}</tbody></table>
+       <p class="note">${'Sugar includes natural milk and fruit sugars; allulose and stevia count as 0. '+(r.base.concat(r.mix).some(x=>x[0]==='allulose')?'Allulose counted as 0.2 kcal/g. ':'')+(r.base.some(x=>x[0]==='greek')&&state.yog==='greek'?'Greek yogurt counted as 0% fat; 2% adds about 3 g fat per 150 g. ':'')}Calculated from typical values for each ingredient.</p>
+     </div>
+     <div>
+       <div class="dtools"><button class="btn primary" type="button" id="cookBtn">${lastCook&&lastCook.key===cookKey(r0)&&lastCook.i>0?`▶ Resume cooking · step ${lastCook.i}`:'▶ Cooking mode'}</button>${freezeChip(r.id,true)}</div>
+       <h3>Method</h3>
+       <ol class="steps">${steps(r).map(s=>`<li><span>${esc(s)}</span></li>`).join('')}</ol>
+       ${state.lean&&!r.leanSame?`<div class="tip"><b>Lean swaps.</b> Cream becomes ultra-filtered milk and skyr, sugar becomes allulose (or stevia), sauces go sugar-free, and the richest mix-ins are halved. Expect a lighter, softer texture than the original.</div>`:''}
+       ${r.tip?`<div class="tip"><b>Tip.</b> ${esc(r.tip)}</div>`:''}
+       <div class="dactions"><button class="btn" type="button" data-fav="${r.id}" aria-pressed="${favs.has(r.id)}">${favs.has(r.id)?'Saved':'Save recipe'}</button>
+       <button class="btn" type="button" id="copyBtn">Copy recipe</button></div>
+       <div class="log"><button class="btn" type="button" id="madeBtn">${(log[r.id]&&log[r.id].n)?`Made it ×${log[r.id].n} · add one`:'I made this'}</button>
+       <label for="note-${r.id}" hidden>My notes</label><textarea id="note-${r.id}" data-note="${r.id}" placeholder="My notes: re-spins needed, sweetness, what to change next time">${esc((log[r.id]&&log[r.id].note)||'')}</textarea></div>
+     </div>
+   </div>`;
+  if(!dlg.open) dlg.showModal(); else if(keep){ const k=dlg.querySelector(keep); if(k) k.focus({preventScroll:true}); }
+}
+function recipeText(r0){
+  const r=view(r0), m=F();
+  const L=x=>{const l=line(x,m);return `- ${l.q} ${l.name}${l.note?' ('+l.note+')':''}`;};
+  return `${r.name}${state.lean&&!r.leanSame?' (lean)':''} (inspired by ${r.brand} ${r.flavor})\n${STYLE[r.style]} · ${r.program} · ${state.ml} ml tub\n\nBase\n${r.base.map(L).join('\n')}${r.mix.length?'\n\nMix-ins\n'+r.mix.map(L).join('\n'):''}\n\nMethod\n${steps(r).map((s,i)=>`${i+1}. ${s}`).join('\n')}${r.tip?'\n\nTip: '+r.tip:''}`;
+}
+function setLean(v){ state.lean=v; $('#leanBtn').setAttribute('aria-pressed',v); store('pintlab-lean',v?'1':'0'); render(); if(dlg.open&&cur) openRecipe(cur); }
+dlg.addEventListener('click',e=>{
+  if(e.target===dlg||e.target.closest('[data-close]')){ closeDlg(); return; }
+  if(e.target.closest('#cookBtn')){ openCook(cur); return; }
+  if(e.target.closest('#madeBtn')){ const L=log[cur.id]=log[cur.id]||{n:0,note:''}; L.n++; saveLog(); render(); openRecipe(cur); return; }
+  const ln=e.target.closest('[data-lean]'); if(ln){ setLean(ln.dataset.lean==='1'); return; }
+  const f=e.target.closest('[data-fav]'); if(f){ toggleFav(f.dataset.fav); return; }
+  if(e.target.closest('#copyBtn')){
+    const b=e.target.closest('#copyBtn'), txt=recipeText(cur);
+    const done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy recipe',1600);};
+    try{ navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,b)); }catch(err){ fallbackCopy(txt,b); }
+  }
+});
+function fallbackCopy(txt,b){ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; dlg.appendChild(ta); ta.select(); let ok=false; try{ok=document.execCommand('copy');}catch(e){} ta.remove(); b.textContent=ok?'Copied':'Copy not allowed here'; setTimeout(()=>b.textContent='Copy recipe',1800); }
+function closeDlg(){ if(dlg.open) dlg.close(); }
+dlg.addEventListener('input',e=>{ const t=e.target.closest('[data-note]'); if(!t) return; const L=log[t.dataset.note]=log[t.dataset.note]||{n:0,note:''}; L.note=t.value; saveLog(); });
+dlg.addEventListener('close',()=>{ if(location.hash.startsWith('#r-')) history.replaceState(null,'',location.pathname+location.search); cur=null; });
+function route(){ const h=location.hash.slice(1); if(h.startsWith('r-')){ const r=R.find(x=>x.id===h.slice(2)); if(r) openRecipe(r); } else closeDlg(); }
+window.addEventListener('hashchange',route);
+$('#surprise').addEventListener('click',()=>{ const l=filtered(); const pool=l.length?l:R; location.hash='r-'+pool[Math.floor(Math.random()*pool.length)].id; });
+$('#leanBtn').addEventListener('click',()=>setLean(!state.lean));
+const mlIn=$('#ml');
+function setMl(v,fromInput){ v=Math.round(+v); if(!(v>=150&&v<=2000)) return; state.ml=v; store('pintlab-ml2',String(v)); if(!fromInput) mlIn.value=v; document.querySelectorAll('[data-ml]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.ml===v)); render(); if(dlg.open&&cur) openRecipe(cur); }
+mlIn.addEventListener('input',()=>setMl(mlIn.value,true));
+document.querySelectorAll('[data-ml]').forEach(b=>b.addEventListener('click',()=>setMl(b.dataset.ml)));
+['sweet','yog'].forEach(k=>{ const el=$('#'+k); el.value=state[k]; el.addEventListener('change',()=>{ state[k]=el.value; store('pintlab-'+k,el.value); render(); if(dlg.open&&cur) openRecipe(cur); }); });
+mlIn.value=state.ml; $('#leanBtn').setAttribute('aria-pressed',state.lean);
+document.querySelectorAll('[data-ml]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.ml===state.ml));
+
+
+/* ---------- Setup sheet ---------- */
+const sheet=$('#setup');
+function setupSummary(){
+  const n=(state.style!=='all')+(state.sort!=='brand')+(state.noCC?1:0)+state.quick.size;
+  const bd=$('#setupBadge'); bd.hidden=!n; bd.textContent=n;
+  $('#setupSummary').textContent=`${state.ml} ml tub · ${state.sweet==='stevia'?'stevia':'allulose'} · ${state.yog==='greek'?'Greek yogurt':'skyr'}${state.noCC?' · no cream cheese':''} · change`;
+}
+$('#setupBtn').addEventListener('click',()=>sheet.showModal());
+$('#setupSummary').addEventListener('click',()=>sheet.showModal());
+sheet.addEventListener('click',e=>{ if(e.target===sheet||e.target.closest('[data-closesheet]')) sheet.close(); });
+$('#resetSetup').addEventListener('click',()=>{ Object.assign(state,{style:'all',sort:'brand',noCC:false}); state.quick.clear(); renderQuick(); $('#sort').value='brand'; $('#ccBtn').setAttribute('aria-checked','false'); renderStyles(); render(); });
+
+/* ---------- Freezer tracking ---------- */
+let freezer={}; try{ freezer=JSON.parse(localStorage.getItem('pintlab-freezer')||'{}'); }catch(e){}
+const saveFreezer=()=>store('pintlab-freezer',JSON.stringify(freezer));
+const DAY=864e5;
+function freezeChip(id,big){
+  const t=freezer[id]; if(!t) return '';
+  const left=t+DAY-Date.now();
+  if(left<=0) return `<span class="chip ready">Ready to spin</span>`;
+  const h=Math.floor(left/36e5), m=Math.floor((left%36e5)/6e4);
+  return `<span class="chip freeze">In freezer · ${h?h+'h ':''}${m}m left</span>`;
+}
+setInterval(()=>{ if(!Object.keys(freezer).length) return; if(document.querySelector('dialog[open]')||$('#grid').contains(document.activeElement)) renderShelf(); else render(); },60000);
+
+/* ---------- Cooking mode ---------- */
+const cookDlg=$('#cook');
+let ck=null, wake=null, tmr=null, audio=null;
+function cookPages(r){
+  const st=steps(r);
+  return [{type:'ing'},...st.map(t=>({type:'step',t}))];
+}
+const cookKey=r0=>r0.id+'|'+(state.lean?'L':'O')+'|'+state.sweet+'|'+state.yog;
+function openCook(r0){
+  const r=view(r0);
+  const key=cookKey(r0), pages=cookPages(r), res=lastCook&&lastCook.key===key&&lastCook.i<pages.length;
+  ck={key,r0,r,pages,i:res?lastCook.i:0,checked:res?lastCook.checked:new Set()};
+  renderCook(); if(!cookDlg.open) cookDlg.showModal();
+  try{ navigator.wakeLock && navigator.wakeLock.request('screen').then(w=>{wake=w;},()=>{}); }catch(e){}
+}
+function closeCook(){ if(cookDlg.open) cookDlg.close(); }
+cookDlg.addEventListener('close',()=>{ try{ wake&&wake.release(); }catch(e){} wake=null; if(ck) lastCook={key:ck.key,i:ck.i,checked:ck.checked}; ck=null; if(dlg.open&&cur) openRecipe(cur); });
+let lastCook=null;
+function fmt(sec){ const m=Math.floor(sec/60), s=sec%60; return `${m}:${String(s).padStart(2,'0')}`; }
+function beep(){ try{ if(!audio) return; [0,0.35,0.7].forEach(t=>{ const o=audio.createOscillator(), g=audio.createGain(); o.frequency.value=880; o.connect(g); g.connect(audio.destination); g.gain.setValueAtTime(0.25,audio.currentTime+t); g.gain.exponentialRampToValueAtTime(0.001,audio.currentTime+t+0.3); o.start(audio.currentTime+t); o.stop(audio.currentTime+t+0.3); }); }catch(e){} }
+function startTimer(min){
+  try{ audio=audio||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  stopTimer(); const end=Date.now()+min*60000;
+  tmr={end,min,id:setInterval(tick,250)}; tick();
+}
+function stopTimer(){ if(tmr){ clearInterval(tmr.id); tmr=null; } }
+function tick(){
+  const el=document.getElementById('ckTime'); if(!tmr) return;
+  const sec=Math.max(0,Math.round((tmr.end-Date.now())/1000));
+  if(el) el.textContent=fmt(sec);
+  const chip=document.getElementById('ckChip'); if(chip) chip.textContent='⏱ '+fmt(sec);
+  if(sec<=0){ clearInterval(tmr.id); const box=document.getElementById('ckTimerBox'); if(box){ box.classList.add('done'); } if(el) el.textContent='Done'; if(chip) chip.textContent='⏱ Done'; beep(); tmr.done=true; }
+}
+function renderCook(focusSel){
+  const {r,pages,i}=ck, pg=pages[i], m=F();
+  const total=pages.length;
+  let body='';
+  if(pg.type==='ing'){
+    const item=(x,k)=>{ const l=line(x,m), on=ck.checked.has(k); return `<li><button type="button" role="checkbox" aria-checked="${on}" data-ck="${k}"><span class="box">${on?'✓':''}</span><span class="q">${esc(l.q)}</span><span class="nm">${esc(l.name)}${l.note?` <small>· ${esc(l.note)}</small>`:''}</span></button></li>`; };
+    body=`<div class="ck-label">Get everything ready</div>
+      <p class="ck-step" style="font-size:clamp(20px,4.6vw,26px)">Tick off each ingredient as you measure it.</p>
+      <div class="ck-sub">Base</div><ul class="ck-list">${r.base.map((x,j)=>item(x,'b'+j)).join('')}</ul>
+      ${r.mix.length?`<div class="ck-sub">${r.program==='Milk Shake'?'Add when spinning':r.kind==='drink'?'Toppings':'Mix-ins'}</div><ul class="ck-list">${r.mix.map((x,j)=>item(x,'m'+j)).join('')}</ul>`:''}`;
+  } else {
+    const t=pg.t, mm=t.match(/(\d+) minutes?/), frz=/24 hours/.test(t);
+    let extra='';
+    if(frz){
+      extra=`<div class="ck-actions"><button class="btn primary" type="button" data-freeze>${freezer[r.id]?'Restart the 24 h count':'It\'s in the freezer'}</button>${freezer[r.id]?`<button class="btn" type="button" data-unfreeze>Clear</button>`:''}</div>
+        <p class="note" style="font-size:14px">${freezer[r.id]?`Ready to spin from ${new Date(freezer[r.id]+DAY).toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'})}. The card shows a countdown.`:'Tap it when the tub goes in. The recipe card will count down the 24 hours.'}</p>`;
+    } else if(mm){
+      const min=+mm[1], running=tmr&&tmr.min===min;
+      extra=`<div class="ck-timer${running&&tmr.done?' done':''}" id="ckTimerBox"><b id="ckTime">${running?'':fmt(min*60)}</b>
+        <div class="ck-actions">${running?`<button class="btn" type="button" data-stop>Stop</button>`:`<button class="btn primary" type="button" data-timer="${min}">Start ${min}-min timer</button>`}</div></div>`;
+    }
+    const tip = (i===total-1&&r.tip)?`<div class="tip"><b>Tip.</b> ${esc(r.tip)}</div>`:'';
+    body=`<div class="ck-label">Step ${i} of ${total-1}</div><p class="ck-step">${esc(t)}</p>${extra}${tip}`;
+  }
+  cookDlg.innerHTML=`
+    <div class="ck-head"><div class="t"><h2>${esc(r.name)}</h2><div class="sub">${r.lean&&!r.leanSame?'Lean · ':''}${state.ml} ml tub · ${r.program}</div></div>
+      ${tmr?`<button class="ck-chip" type="button" id="ckChip" data-jump-timer>⏱</button>`:''}
+      <button class="close" type="button" aria-label="Close cooking mode" data-ckclose>×</button></div>
+    <div class="ck-prog"><i style="width:${Math.round((i+1)/total*100)}%"></i></div>
+    <div class="ck-body"><div class="ck-inner" aria-live="polite">${body}</div></div>
+    <div class="ck-foot"><button class="btn" type="button" data-prev ${i===0?'disabled':''}>← Back</button>
+      <button class="btn primary" type="button" data-next>${i===total-1?'Finish':i===0?'Start →':'Next →'}</button></div>`;
+  if(tmr) tick();
+  const fe=cookDlg.querySelector(focusSel||'[data-next]'); if(fe&&cookDlg.open) fe.focus({preventScroll:true});
+  const bd=cookDlg.querySelector('.ck-body'); if(bd&&(!focusSel||/next|prev/.test(focusSel))) bd.scrollTop=0;
+}
+cookDlg.addEventListener('click',e=>{
+  if(!ck) return;
+  const t=e.target;
+  if(t.closest('[data-ckclose]')){ closeCook(); return; }
+  if(t.closest('[data-prev]')){ if(ck.i>0){ ck.i--; renderCook(ck.i>0?'[data-prev]':'[data-next]'); } return; }
+  if(t.closest('[data-next]')){ if(ck.i<ck.pages.length-1){ ck.i++; renderCook('[data-next]'); } else { stopTimer(); ck=null; lastCook=null; closeCook(); if(dlg.open&&cur) openRecipe(cur); } return; }
+  const c=t.closest('[data-ck]'); if(c){ const k=c.dataset.ck; ck.checked.has(k)?ck.checked.delete(k):ck.checked.add(k); renderCook(`[data-ck="${k}"]`); return; }
+  const tm=t.closest('[data-timer]'); if(tm){ startTimer(+tm.dataset.timer); renderCook('[data-stop]'); return; }
+  if(t.closest('[data-stop]')){ stopTimer(); renderCook('[data-timer]'); return; }
+  if(t.closest('[data-jump-timer]')){ const j=ck.pages.findIndex(p=>p.type==='step'&&tmr&&new RegExp('\\b'+tmr.min+' minutes?').test(p.t)); if(j>=0){ ck.i=j; renderCook(); } return; }
+  if(t.closest('[data-freeze]')){ freezer[ck.r.id]=Date.now(); saveFreezer(); render(); renderCook('[data-freeze]'); return; }
+  if(t.closest('[data-unfreeze]')){ delete freezer[ck.r.id]; saveFreezer(); render(); renderCook(); return; }
+});
+cookDlg.addEventListener('keydown',e=>{ if(!ck) return; if(e.key==='ArrowRight'){ if(ck.i<ck.pages.length-1){ck.i++;renderCook();} } if(e.key==='ArrowLeft'){ if(ck.i>0){ck.i--;renderCook();} } });
+
+
+/* ---------- quick macro filters ---------- */
+const QUICK={k400:['Under 400 kcal',n=>n.k<=400],p40:['40 g+ protein',n=>n.p>=40],f10:['Under 10 g fat',n=>n.f<=10],s25:['Under 25 g sugar',n=>n.s<=25]};
+function quickOK(r){ if(!state.quick.size) return true; const v=view(r), f=F(), n={k:v.nut.k*f,p:v.nut.p*f,f:v.nut.f*f,s:v.nut.s*f}; for(const k of state.quick) if(!QUICK[k][1](n)) return false; return true; }
+function renderQuick(){ $('#quick').innerHTML=Object.entries(QUICK).map(([k,[l]])=>`<button type="button" data-quick="${k}" aria-pressed="${state.quick.has(k)}">${l}</button>`).join(''); }
+$('#quick').addEventListener('click',e=>{ const b=e.target.closest('[data-quick]'); if(!b) return; const k=b.dataset.quick; state.quick.has(k)?state.quick.delete(k):state.quick.add(k); renderQuick(); render(); });
+/* ---------- made-it log ---------- */
+let log={}; try{ log=JSON.parse(localStorage.getItem('pintlab-log')||'{}'); }catch(e){}
+const saveLog=()=>store('pintlab-log',JSON.stringify(log));
+/* ---------- freezer shelf + active filters ---------- */
+function renderShelf(){
+  const ids=Object.keys(freezer).filter(id=>R.some(r=>r.id===id)).sort((a,b)=>freezer[a]-freezer[b]);
+  const el=$('#shelf'); el.hidden=!ids.length; if(!ids.length) return;
+  el.innerHTML='<h2>In your freezer</h2><div class="shelf-row">'+ids.map(id=>{ const r=R.find(x=>x.id===id), left=freezer[id]+DAY-Date.now(), ready=left<=0;
+    const h=Math.floor(left/36e5), m=Math.floor((left%36e5)/6e4);
+    return `<div class="tubcard${ready?' ready':''}"><button class="open" type="button" data-open="${id}">${pintSVG(r,40)}<span><b>${esc(r.name)}</b><small>${ready?'Ready to spin':`${h?h+'h ':''}${m}m left`}</small></span></button><button class="x" type="button" data-thaw="${id}" aria-label="Remove ${esc(r.name)} from freezer">×</button></div>`; }).join('')+'</div>';
+}
+$('#shelf').addEventListener('click',e=>{ const o=e.target.closest('[data-open]'); if(o){ location.hash='r-'+o.dataset.open; return; } const x=e.target.closest('[data-thaw]'); if(x){ delete freezer[x.dataset.thaw]; saveFreezer(); render(); } });
+function renderActive(){
+  const a=[];
+  if(state.q) a.push(['q',`“${state.q}”`]);
+  if(state.brand!=='all') a.push(['brand',state.brand]);
+  if(state.style!=='all') a.push(['style',STYLE[state.style]]);
+  for(const k of state.quick) a.push(['quick:'+k,QUICK[k][0]]);
+  if(state.noCC) a.push(['cc','No cream cheese']);
+  if(state.favOnly) a.push(['fav','Saved only']);
+  const el=$('#active'); el.hidden=!a.length; el.innerHTML=a.map(([k,l])=>`<button type="button" data-clear="${esc(k)}" aria-label="Remove filter ${esc(l)}">${esc(l)}</button>`).join('');
+}
+$('#active').addEventListener('click',e=>{ const b=e.target.closest('[data-clear]'); if(!b) return; const k=b.dataset.clear;
+  if(k==='q'){ state.q=''; $('#q').value=''; } else if(k==='brand'){ state.brand='all'; renderBrands(); } else if(k==='style'){ state.style='all'; renderStyles(); }
+  else if(k==='cc'){ state.noCC=false; $('#ccBtn').setAttribute('aria-checked','false'); } else if(k==='fav'){ state.favOnly=false; $('#favBtn').setAttribute('aria-pressed','false'); }
+  else if(k.startsWith('quick:')){ state.quick.delete(k.slice(6)); renderQuick(); }
+  render(); });
+const totop=$('#totop'); totop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+window.addEventListener('scroll',()=>{ totop.hidden=window.scrollY<900; },{passive:true});
+document.addEventListener('keydown',e=>{ if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){ e.preventDefault(); $('#q').focus(); } });
+renderQuick();
+
+document.documentElement.lang='en';
+$('#total').textContent=R.length;
+renderKinds(); renderStyles(); renderBrands(); render(); setupSummary(); route();
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
+</body>
+</html>
