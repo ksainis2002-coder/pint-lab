@@ -420,6 +420,21 @@ const I = {
   choux:['profiterole choux shells','g',1,360,9,26,22,'#D9A55E'],
   coconut:['toasted coconut flakes','g',1,660,6.9,65,24,'#F1E6CF'],
   blondie:['blondie','g',1,430,5,20,58,'#D9A85E'],
+  peanut:['roasted peanuts','g',1,567,26,49,16,'#C99A5E'],
+  macadamia:['macadamia nuts, chopped','g',1,718,8,76,14,'#E9D9B5'],
+  cashew:['roasted cashews, chopped','g',1,553,18,44,30,'#DDBE8A'],
+  raisin:['raisins','g',1,299,3,0.5,79,'#3B2130'],
+  popcorn:['caramel popcorn','g',1,430,4,13,79,'#D9A441'],
+  maple:['maple syrup','tbsp',20,260,0,0.1,67,'#A8601C'],
+  apple:['apple, diced and softened in a pan','g',1,52,0.3,0.2,14,'#E7D9A0'],
+  plum:['ripe plums, pitted','g',1,46,0.7,0.3,11],
+  ginger:['ground ginger','tsp',2,0,0,0,0],
+  ricotta:['ricotta','g',1,174,11,13,3],
+  sweetpotato:['sweet potato purée','g',1,86,1.6,0.1,20,'#D9772B'],
+  gingersnap:[['gingersnap cookie','gingersnap cookies'],'',7,420,5,10,77,'#9A5B2A'],
+  marzipan:['marzipan, diced','g',1,460,9,26,48,'#EBD9A8'],
+  kiwi:['kiwi, peeled','g',1,61,1.1,0.5,15],
+  blackb:['blackberries','g',1,43,1.4,0.5,10],
   shortbread:[['shortbread cookie','shortbread cookies'],'',8,500,6,25,64,'#E8CF9A'],
   crisps:['salted potato chips','g',1,536,7,35,53,'#E8C25A'],
   pumpkin:['pumpkin purée','g',1,34,1,0.3,8],
@@ -1092,8 +1107,137 @@ const R = [
   tip:'This is "metrio" with 40 g sugar. Even "sketo" needs at least 20 g to slush.'},
 ];
 
+/* ---------- Ben & Jerry's: more current, international and retired flavours ---------- */
+const COF=(sg=70,e=2)=>[['milk',220],['cream',170],['sugar',sg],['espresso',e],['salt',1]];
+const CAR=()=>[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',1]];
+const PBB=()=>[['milk',240],['cream',120],['pb',3],['sugar',60],['salt',1]];
+const MNT=()=>[['milk',220],['cream',170],['sugar',70],['mint',0.75],['salt',1]];
+const BAN=()=>[['banana',1,'very ripe'],['milk',200],['cream',140],['sugar',45],['vanilla',1],['salt',1]];
+const BJ=(id,name,flavor,color,base,mix,o={})=>({id,name,brand:"Ben & Jerry's",flavor:flavor+(o.gone?' (retired)':''),style:'full',program:'Ice Cream',color,base,mix,swirl:mix.some(x=>/swirl/.test(x[2]||'')),prep:(base.some(x=>x[0]==='cocoa'&&x[1]>=2)?[BLOOM]:undefined),...o});
+const SORB={style:'sorbet',program:'Sorbet'}, FRO={program:'Frozen Yogurt',kind:'froyo'};
+R.push(
+ /* cores */
+ BJ('hazelnut-fudge-core','Hazelnut Fudge Core','Hazelnut Fudge Core','#7A5238',[['milk',240],['cream',140],['nutella',2],['cocoa',1],['sugar',50],['salt',1]],[['dark',20,'chunks'],['nutella',3,'spooned in as a core']],{gone:1}),
+ BJ('speculoos-core','Cookie Butter Core','Spectacular Speculoos Cookie Core','#C79262',[['milk',240],['cream',130],['biscoff',2],['brown',35],['salt',1]],[['lotus',3,'broken'],['biscoff',3,'spooned in as a core']]),
+ BJ('thats-my-jam-core','Raspberry Jam Core',"That's My Jam Core",'#6A4331',CHOC(2.5),[['minichips',20],['jam',3,'raspberry, spooned in as a core']],{gone:1}),
+ BJ('pb-fudge-core','Peanut Butter Fudge Core','Peanut Butter Fudge Core','#A77A52',[['milk',240],['cream',120],['pb',2],['cocoa',1.5],['sugar',60],['salt',1]],[['pbcup',4,'quartered'],['fudge',1.5,'mixed with the peanut butter, spooned in as a core'],['pb',1.5]],{gone:1}),
+ BJ('blondie-brownie-core','Blondie Brownie Core','Blondie Brownie Core','#D9B98C',SW(60),[['blondie',30],['brownie',30],['caramel',3,'salted, spooned in as a core']],{gone:1}),
+ BJ('sweet-like-sugar-cookie-core','Sugar Cookie Dough Core','Sweet Like Sugar Cookie Dough Core','#F3E6CE',SW(60),[['shortbread',3,'crushed'],['dough',60,'sugar cookie dough, pressed in as a core']]),
+ BJ('mint-chocolate-cookie-core','Mint Cookie Fudge Core','Mint Chocolate Chance Core','#DCEBDD',MNT(),[['oreo',3,'crushed'],['fudge',3,'spooned in as a core']]),
+ /* topped */
+ BJ('topped-chocolate-caramel-cookie-dough','Topped Caramel Cookie Dough','Chocolate Caramel Cookie Dough (Topped)','#D9B585',CAR(),[['dough',45],['minichips',15],['dark',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-pb-over-the-top','Topped PB Over The Top','PB Over the Top (Topped)','#6A4331',CHOC(2.5),[['pbcup',4,'quartered'],['pb',2,'swirl'],['dark',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-thick-mint','Topped Thick Mint','Thick Mint (Topped)','#DCEBDD',MNT(),[['oreo',4,'crushed'],['fudge',1.5,'swirl'],['dark',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-tiramisu','Topped Tiramisù','Tiramisu (Topped)','#E6D5BB',[['milk',240],['mascarpone',90],['cream',40],['sugar',65],['espresso',1],['salt',1]],[['savoiardi',3,'broken'],['fudge',1.5,'swirl'],['dark',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-strawberry-tart','Topped Strawberry Tart','Strawberry Topped Tart (Topped)','#F3C3CC',[['straw',160,'blended'],['milk',130],['cream',140],['sugar',70],['salt',1]],[['shortbread',3,'broken'],['jam',2,'strawberry, swirl'],['white',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-dirt-cake','Topped Dirt Cake','Dirt Cake (Topped)','#D9C8A8',SW(60),[['oreo',4,'crushed to crumbs'],['fudge',2,'swirl'],['dark',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-bossin-cream-pie','Topped Boston Cream Pie',"Bossin' Cream Pie (Topped)",'#F3E4BE',SW(60),[['cake',35,'yellow cake, cubed'],['fudge',2,'swirl'],['dark',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ BJ('topped-whiskey-biz','Topped Caramel Blondie','Whiskey Biz (Topped, alcohol-free)','#E4C99A',[['milk',220],['cream',170],['brown',55],['sugar',10],['vanilla',1.5],['salt',1]],[['blondie',40],['caramel',2,'swirl'],['white',25,'melted with the coconut oil, poured on top'],['cocooil',1]]),
+ /* current & recent */
+ BJ('pecan-resist','Pecan Resist','Pecan Resist','#5A3628',CHOC(3),[['white',15,'chunks'],['dark',15,'chunks'],['pecan',15],['walnut',10],['almond',10]],{gone:1}),
+ BJ('justice-remixd','Cinnamon Chocolate Remix',"Justice ReMix'd",'#9A6B4C',[['milk',240],['cream',150],['sugar',65],['cocoa',1],['cinnamon',1],['salt',1]],[['dough',35,'tossed with cinnamon'],['brownie',35,'dusted with a pinch of cayenne']],{gone:1}),
+ BJ('empower-mint','Peppermint Fudge Brownie','Empower Mint','#E3EFE2',MNT(),[['brownie',40],['fudge',2,'swirl']],{gone:1}),
+ BJ('change-is-brewing','Cold Brew Marshmallow Brownie','Change is Brewing','#A98161',[['milk',160],['cream',170],['espressoml',70,'cold brew concentrate'],['sugar',70],['salt',1]],[['fluff',2,'swirl'],['brownie',40]],{gone:1}),
+ BJ('punch-line','Almond Cherry Brown Butter','Punch Line (alcohol-free)','#EBD9B8',[['milk',220],['cream',160],['brown',50],['sugar',15],['butter',10,'browned in a pan first'],['salt',1]],[['almond',25,'roasted'],['cherry',50,'halved, patted dry']]),
+ BJ('mind-your-own-batter','Brownie Batter Swirl','Brownie Batter','#6A4331',CHOC(2.5),[['fudge',3,'swirl'],['brownie',35,'crumbled into the fudge']]),
+ BJ('churray-for-churros','Churro Swirl','Churray for Churros!','#EBD3A8',[['milk',220],['cream',170],['brown',45],['sugar',20],['cinnamon',1],['salt',1]],[['shortbread',4,'tossed in cinnamon sugar'],['caramel',1.5,'cinnamon caramel, swirl']]),
+ BJ('dulce-delish','Dulce Delish','Dulce Delish','#DDB98A',CAR(),[['dulce',2,'swirl'],['minichips',20]]),
+ BJ('lights-caramel-action','Caramel Cookie Dough Graham','Lights! Caramel! Action!','#F1E2C2',SW(60),[['caramel',2,'salted, swirl'],['graham',2,'crushed'],['dough',40]]),
+ BJ('creme-brulee-cookie','Crème Brûlée Cookie','Crème Brûlée Cookie','#EED9A8',[['milk',220],['cream',170],['brown',55],['sugar',10],['vanilla',2],['salt',1]],[['shortbread',3,'broken'],['caramel',2,'cooked dark, swirl']]),
+ BJ('oatmeal-dream-pie','Oatmeal Dream Pie','Oatmeal Dream Pie','#F0E2C6',SW(60),[['oatcookie',2,'broken'],['fluff',3,'swirl']]),
+ BJ('strawberry-cheezecake-tart','Strawberry Graham Swirl','Strawberry Cheesecake Tart','#F3D5D8',[['ccg',80],['milk',210],['cream',80],['sugar',70],['lemon',0.5],['salt',1]],[['jam',2.5,'strawberry, swirl'],['graham',2,'broken']]),
+ BJ('chocolate-caramel-cluster','Chocolate Caramel Cluster','Chocolate Caramel Cluster','#5E3A2A',CHOC(2.5),[['peanut',20],['dark',15,'melted over the peanuts'],['caramel',2,'salted, swirl']]),
+ BJ('coffee-caramel-fudge','Coffee Caramel Fudge','Coffee Caramel Fudge','#B58764',COF(65),[['caramel',2,'swirl'],['dark',25,'chunks']]),
+ BJ('coffee-caramel-buzz','Coffee Caramel Buzz','Coffee Caramel Buzz','#B08665',COF(65,2.5),[['caramel',2,'swirl'],['beans',20,'chopped']],{gone:1}),
+ BJ('candy-bar-pie','Candy Bar Pie','Candy Bar Pie','#D2A46C',PBB(),[['pretzel',15,'broken'],['dark',20,'chunks'],['caramel',2,'salted, swirl']],{gone:1}),
+ BJ('late-night-snack','Late Night Snack','Late Night Snack','#F3E7CA',SW(60),[['caramel',2,'salted, swirl'],['crisps',15,'crushed, coated in 15 g melted chocolate'],['dark',15]],{gone:1}),
+ BJ('clusterfluff','Clusterfluff','Clusterfluff','#D9B07A',PBB(),[['fluff',2,'swirl'],['pb',1,'swirl'],['toffee',15,'caramel clusters']],{gone:1}),
+ BJ('what-a-cluster','What a Cluster','What a Cluster','#D7AE78',PBB(),[['toffee',20,'caramel clusters'],['fluff',2,'swirl'],['pb',1,'swirl']],{gone:1}),
+ BJ('imagine-whirled-peace','Caramel Sweet Cream Peace','Imagine Whirled Peace','#EBD3A8',[['milk',230],['cream',160],['dulce',2],['sugar',45],['salt',1]],[['toffee',20],['dark',20,'chunks']],{gone:1}),
+ BJ('one-sweet-whirled','Caramel Coffee Marshmallow Whirl','One Sweet Whirled','#C9A27C',[['milk',220],['cream',160],['dulce',2],['espresso',1],['sugar',45],['salt',1]],[['fluff',2,'swirl'],['caramel',1.5,'swirl'],['minichips',20]],{gone:1}),
+ BJ('magic-brownies','Black Raspberry Brownie','Magic Brownies','#E7C7D6',[['milk',220],['cream',170],['sugar',65],['vanilla',1],['salt',1]],[['jam',2.5,'black raspberry, swirl'],['brownie',45]],{gone:1}),
+ BJ('goodbye-yellow-brickle-road','Yellow Brickle Road','Goodbye Yellow Brickle Road','#5E3A2A',CHOC(2.5),[['dough',30,'peanut butter cookie dough'],['toffee',20,'butter brickle'],['white',15,'chunks']],{gone:1}),
+ BJ('maple-blondie','Maple Blondie',"Hannah Teter's Maple Blondie",'#E8CFA0',[['milk',220],['cream',170],['maple',3],['sugar',25],['salt',1]],[['blondie',45],['maple',1,'mixed with the caramel, swirl'],['caramel',1]],{gone:1}),
+ BJ('country-peach-cobbler','Country Peach Cobbler',"Willie Nelson's Country Peach Cobbler",'#F6CFA0',[['peach',170,'blended'],['milk',130],['cream',140],['sugar',65],['salt',1]],[['shortbread',3,'tossed in cinnamon sugar'],['jam',2,'peach, swirl']],{gone:1}),
+ BJ('neapolitan-dynamite','Cherry & Brownie Dynamite','Neapolitan Dynamite','#D9A4B0',SW(65),[['cherry',50,'halved, patted dry'],['dark',15,'shaved'],['brownie',40]],{gone:1,tip:'The original is two ice creams side by side. Spin this cherry-vanilla tub and a Fudge Brownie tub, then pack half of each into one tub.'}),
+ BJ('bonnaroo-buzz','Coffee Malt Toffee Buzz','Bonnaroo Buzz','#B88B67',[['milk',220],['cream',170],['sugar',55],['malt',2],['espresso',1.5],['salt',1]],[['toffee',25],['caramel',2,'swirl']],{gone:1}),
+ BJ('mission-to-marzipan','Mission to Marzipan','Mission to Marzipan','#F1E6CC',[['milk',220],['cream',170],['sugar',60],['marzipan',30,'blended in'],['salt',1]],[['marzipan',30],['almond',15],['caramel',1.5,'swirl']],{gone:1}),
+ BJ('festivus','Gingerbread Brown Sugar','Festivus','#D9B585',[['milk',220],['cream',170],['brown',60],['cinnamon',0.5],['ginger',0.5],['salt',1]],[['gingersnap',4,'broken'],['caramel',2,'ginger caramel, swirl']],{gone:1}),
+ BJ('schweddy-balls','Malt Ball Vanilla','Schweddy Balls (alcohol-free)','#F4E9CD',[['milk',220],['cream',170],['sugar',55],['malt',2],['vanilla',1.5],['salt',1]],[['candy',40,'chocolate-covered malt balls, halved']],{gone:1}),
+ BJ('vermonty-python','Coffee Cookie Crumb Fudge','Vermonty Python (alcohol-free)','#B08665',COF(65,1.5),[['oreo',3,'crushed to crumbs'],['dark',25,'chunks']],{gone:1}),
+ BJ('white-russian','Coffee Cream','White Russian (alcohol-free)','#D9C3A5',[['milk',200],['cream',190],['sugar',70],['espresso',1.5],['vanilla',1],['salt',1]],[],{gone:1}),
+ BJ('tennessee-mud','Coffee Almond Mud','Tennessee Mud (alcohol-free)','#B58764',COF(65),[['almond',30,'roasted, slivered'],['fudge',1.5,'swirl']],{gone:1}),
+ BJ('mud-pie','Mud Pie','Mud Pie (alcohol-free)','#7E5338',[['milk',240],['cream',150],['sugar',65],['cocoa',1.5],['espresso',1.5],['salt',1]],[['oreo',4,'crushed to crumbs'],['fudge',1.5,'swirl']],{gone:1}),
+ BJ('dastardly-mash','Dastardly Mash','Dastardly Mash','#5E3A2A',CHOC(3),[['pecan',15],['almond',15],['raisin',20],['minichips',15]],{gone:1}),
+ BJ('economic-crunch','Economic Crunch','Economic Crunch','#F4E9CD',SW(65),[['almond',15],['pecan',15],['walnut',10],['dark',20,'melted over the nuts']],{gone:1}),
+ BJ('ethan-almond','Ethan Almond','Ethan Almond','#F4E9CD',SW(65),[['almond',35],['dark',20,'melted over the almonds']],{gone:1}),
+ BJ('fossil-fuel','Fossil Fuel','Fossil Fuel','#F0E6D2',SW(60),[['oreo',3,'crushed'],['dark',20,'chunks'],['fudge',2,'swirl']],{gone:1}),
+ BJ('turtle-soup','Turtle Soup','Turtle Soup','#F1E3C4',SW(60),[['cashew',25],['dark',15,'melted over the cashews'],['caramel',2.5,'swirl']],{gone:1}),
+ BJ('peanut-butter-and-jelly','Peanut Butter & Jelly','Peanut Butter and Jelly','#D8AE76',PBB(),[['peanut',15],['jam',3,'strawberry, swirl']],{gone:1}),
+ BJ('tuskegee-chunk','Tuskegee Chunk','Tuskegee Chunk','#D8AE76',PBB(),[['dark',35,'chunks']],{gone:1}),
+ BJ('oatmeal-cookie-chunk','Oatmeal Cookie Chunk','Oatmeal Cookie Chunk','#EBD9B5',[['milk',220],['cream',170],['sugar',65],['cinnamon',1],['salt',1]],[['oatcookie',2,'broken'],['dark',25,'chunks']],{gone:1}),
+ BJ('cool-britannia','Cool Britannia','Cool Britannia','#F6E6DC',SW(60),[['straw',60,'diced'],['shortbread',3,'broken'],['dark',15,'melted over the shortbread']],{gone:1}),
+ BJ('bovinity-divinity','Bovinity Divinity','Bovinity Divinity','#A6765A',[['milk',260],['cream',110],['milkchoc',50,'melted into the warm milk'],['sugar',40],['salt',1]],[['white',25,'chunks'],['dark',20,'chunks']],{gone:1}),
+ BJ('aloha-macadamia','Aloha Macadamia','Aloha Macadamia','#9C6E52',[['milk',260],['cream',110],['milkchoc',50,'melted into the warm milk'],['sugar',40],['salt',1]],[['macadamia',30],['dark',15,'melted over the macadamias']],{gone:1}),
+ BJ('chocolate-macadamia','Chocolate Macadamia','Chocolate Macadamia','#B08A68',[['milk',240],['cream',150],['sugar',65],['cocoa',1],['vanilla',1],['salt',1]],[['macadamia',30],['dark',15,'melted over the macadamias']],{gone:1}),
+ BJ('coconut-almond-fudge-chip','Coconut Almond Fudge Chip','Coconut Almond Fudge Chip','#F2EBDC',[['milk',200],['cream',150],['cocomilk',80],['sugar',65],['salt',1]],[['almond',25],['dark',25,'chunks']],{gone:1}),
+ BJ('coconutterly-fair','Chocolate Coconut Caramel','Coconutterly Fair','#5E3A2A',[['milk',220],['cocomilk',120],['cream',60],['sugar',75],['cocoa',2.5],['salt',1]],[['caramel',2,'swirl'],['dark',20,'chunks'],['coconut',10]],{gone:1}),
+ BJ('holy-cannoli','Holy Cannoli','Holy Cannoli','#EEF0D6',[['ricotta',120],['milk',220],['cream',60],['sugar',70],['pistachio',25,'blended in'],['salt',1]],[['cone',25,'tossed in the melted chocolate'],['dark',15],['pistachio',15,'chopped']],{gone:1}),
+ BJ('makin-whoopie-pie','Whoopie Pie',"Makin' Whoopie Pie",'#5E3A2A',CHOC(2.5),[['fluff',3,'swirl'],['sponge',40,"devil's food cake, cubed"]],{gone:1}),
+ BJ('sweet-potato-pie','Ginger Sweet Potato Pie',"Miz Jelena's Sweet Potato Pie",'#E8B878',[['sweetpotato',100],['milk',180],['cream',120],['brown',55],['ginger',0.75],['cinnamon',0.5],['salt',1]],[['gingersnap',3,'broken']],{gone:1}),
+ BJ('peanuts-popcorn','Caramel Popcorn Peanut','Peanuts! Popcorn!','#DDB98A',CAR(),[['popcorn',20],['peanut',20,'toffee-coated or honey-roasted'],['caramel',1.5,'swirl']],{gone:1}),
+ BJ('this-is-nuts','Hazelnut Almond Peanut','This is Nuts','#C9A47C',[['milk',250],['cream',120],['hazelnut',40,'toasted, blended very fine'],['sugar',70],['salt',1]],[['peanut',15,'honey-roasted'],['almond',15],['dark',15,'melted over the almonds']],{gone:1}),
+ BJ('urban-jumble','Urban Jumble','Urban Jumble','#8A5E43',[['milk',240],['cream',150],['sugar',65],['cocoa',1.5],['espresso',1.5],['salt',1]],[['white',15,'chunks'],['dark',15,'chunks'],['pecan',15],['almond',10]],{gone:1}),
+ BJ('honey-apple-raisin','Honey Apple Raisin Cookie','Honey Apple Raisin Chocolate Cookie','#EBD9A8',[['milk',220],['cream',170],['honey',3],['sugar',20],['cinnamon',0.5],['salt',1]],[['apple',50],['raisin',20],['cookie',1,'broken']],{gone:1}),
+ BJ('apple-y-ever-after','Apple Pie','Apple-y Ever After','#EFDDB0',[['milk',220],['cream',170],['brown',45],['sugar',20],['cinnamon',1],['salt',1]],[['apple',60],['shortbread',3,'pie-crust style, broken']],{gone:1}),
+ BJ('wild-maine-blueberry','Wild Blueberry','Wild Maine Blueberry','#A887B5',[['blue',170,'blended'],['milk',130],['cream',140],['sugar',70],['lemon',0.5],['salt',1]],[['blue',40,'whole']],{gone:1}),
+ BJ('fresh-georgia-peach','Fresh Peach','Fresh Georgia Peach','#F6CFA0',[['peach',180,'blended'],['milk',120],['cream',140],['sugar',65],['lemon',0.5],['salt',1]],[['peach',50,'diced']],{gone:1}),
+ BJ('sugar-plum','Sugar Plum','Sugar Plum','#C9A0BD',[['plum',170,'blended'],['milk',130],['cream',140],['sugar',75],['salt',1]],[['caramel',2,'swirl']],{gone:1}),
+ BJ('creme-brulee','Crème Brûlée','Crème Brûlée','#F3E2B4',[['milk',200],['cream',190],['sugar',65],['vanilla',2],['salt',1]],[['caramel',3,'cooked dark, swirl']],{gone:1}),
+ BJ('key-lime-pie','Key Lime Pie','Key Lime Pie','#EEF2D0',[['milk',220],['cream',140],['condensed',80],['lime',3],['sugar',20],['salt',1]],[['graham',2,'broken'],['fluff',2,'swirl']],{gone:1}),
+ BJ('pumpkin-pie-bj','Pumpkin Spice','Pumpkin','#E9B878',[['pumpkin',100],['milk',180],['cream',120],['brown',55],['cinnamon',0.75],['ginger',0.25],['clove',0.25],['salt',1]],[],{gone:1}),
+ BJ('egg-nog','Nutmeg Custard Cream','Egg Nog (egg-free)','#F4E6C2',[['milk',200],['cream',190],['sugar',70],['vanilla',1.5],['cinnamon',0.25,'or nutmeg'],['salt',1]],[],{gone:1}),
+ BJ('peppermint-schtick','Peppermint Schtick','Peppermint Schtick','#F3E3E6',MNT(),[['toffee',25,'crushed candy cane']],{gone:1}),
+ BJ('marsha-marsha-marshmallow','Marsha Marsha Marshmallow','Marsha Marsha Marshmallow','#5E3A2A',CHOC(2.5),[['fluff',3,'toasted under the grill, swirl'],['graham',2,'broken'],['dark',15,'chunks']],{gone:1}),
+ BJ('heath-bar-crunch','Heath Bar Crunch','Heath Bar Crunch','#F3E7CA',SW(65),[['toffee',40]],{gone:1}),
+ BJ('chocolate-pb-swirl','Chocolate Peanut Butter Swirl','Chocolate Peanut Butter Swirl','#5E3A2A',CHOC(2.5),[['pb',3,'swirl']],{gone:1}),
+ BJ('maple-walnut','Maple Walnut','Maple Walnut','#E8CFA0',[['milk',220],['cream',170],['maple',4],['sugar',15],['salt',1]],[['walnut',35,'toasted']],{gone:1}),
+ BJ('butter-almond','Butter Almond','Butter Almond','#F1E3C4',[['milk',220],['cream',170],['brown',35],['sugar',30],['vanilla',1],['salt',1]],[['almond',40,'toasted in the butter'],['butter',10]],{gone:1}),
+ BJ('mocha-fudge','Mocha Fudge','Mocha Fudge','#8A5E43',[['milk',240],['cream',150],['sugar',65],['cocoa',1.5],['espresso',1.5],['salt',1]],[['fudge',3,'swirl']],{gone:1}),
+ BJ('uncanny-cashew','Caramel Cashew','Uncanny Cashew','#DDB98A',CAR(),[['cashew',35],['caramel',1.5,'swirl']],{gone:1}),
+ BJ('sweet-cream-and-cookies','Sweet Cream & Cookies','Sweet Cream & Cookies','#EFEAE0',[['milk',210],['cream',185],['sugar',70],['salt',1]],[['oreo',5,'quartered']],{gone:1}),
+ BJ('chocolate-nougat-crunch','Chocolate Nougat Crunch','Chocolate Nougat Crunch','#5E3A2A',CHOC(2.5),[['fluff',2,'swirl'],['almond',20],['toffee',15]],{gone:1}),
+ BJ('devils-food-chocolate','Dark Chocolate Fudge Swirl',"Devil's Food Chocolate",'#3E2218',CHOC(3.5),[['fudge',3,'swirl']],{gone:1}),
+ BJ('volun-tiramisu','Volun-Tiramisu','Volun-Tiramisu','#E6D5BB',[['milk',240],['mascarpone',90],['cream',40],['sugar',65],['espresso',1.5],['salt',1]],[['savoiardi',3,'broken'],['fudge',1.5,'swirl']],{gone:1}),
+ BJ('black-and-tan','Cream & Chocolate Stout Swirl','Black & Tan (alcohol-free)','#B39A80',[['milk',220],['cream',170],['sugar',55],['malt',3],['salt',1]],[['fudge',3,'swirl']],{gone:1}),
+ BJ('scotchy-scotch','Butterscotch Swirl','Scotchy Scotch Scotch','#EBCB8A',[['milk',220],['cream',170],['brown',60],['vanilla',1],['salt',2]],[['caramel',3,'butterscotch, swirl']],{gone:1}),
+ BJ('concession-obsession','Concession Obsession','Concession Obsession','#F3E7CA',SW(60),[['pbcup',3,'quartered'],['popcorn',15],['caramel',1.5,'swirl'],['fudge',1,'swirl']],{gone:1}),
+ BJ('chocolate-cherry-garcia','Chocolate Cherry Garcia','Chocolate Cherry Garcia','#5E3A2A',CHOC(2.5),[['cherry',70,'halved, patted dry'],['dark',25,'shaved']]),
+ BJ('chocolate-shake-it','Chocolate Malt Shake It','Chocolate Shake It','#7E5338',[['milk',250],['cream',140],['sugar',60],['cocoa',2],['malt',3],['salt',1]],[['fluff',2,'swirl'],['minichips',20]]),
+ BJ('cotton-candy','Fairground Vanilla','Cotton Candy','#F3D6E6',[['milk',220],['cream',170],['sugar',75],['vanilla',2],['salt',1]],[['sprinkles',1]],{tip:'A few drops of cotton candy flavouring, if you can find it, gets this closer to the scoop-shop version.'}),
+ /* frozen yogurt */
+ BJ('froyo-cherry-garcia','Cherry Garcia FroYo','Cherry Garcia Frozen Yogurt','#F1D3DA',[['greek5',240],['milk',140],['sugar',70],['vanilla',1],['salt',1]],[['cherry',70,'halved, patted dry'],['dark',25,'shaved']],FRO),
+ BJ('froyo-half-baked','Half Baked FroYo','Half Baked Frozen Yogurt','#7A5038',[['greek5',220],['milk',160],['sugar',75],['cocoa',2],['salt',1]],[['dough',35],['brownie',35]],FRO),
+ BJ('froyo-cookie-dough','Cookie Dough FroYo','Chocolate Chip Cookie Dough Frozen Yogurt','#F2E5C8',[['greek5',240],['milk',140],['sugar',45],['brown',25],['vanilla',1.5],['salt',1]],[['dough',55],['minichips',15]],{...FRO,gone:1}),
+ BJ('froyo-fudge-brownie','Fudge Brownie FroYo','Chocolate Fudge Brownie Frozen Yogurt','#5E3A2A',[['greek5',220],['milk',160],['sugar',80],['cocoa',3],['salt',1]],[['brownie',55]],FRO),
+ BJ('greek-raspberry-fudge-chunk','Raspberry Fudge Chunk Greek','Raspberry Fudge Chunk Greek','#E7A5B8',[['greek5',220],['rasp',100,'blended and strained'],['milk',70],['sugar',75]],[['dark',30,'chunks']],{...FRO,gone:1}),
+ BJ('greek-blueberry-vanilla-graham','Blueberry Vanilla Graham Greek','Blueberry Vanilla Graham Greek','#D5C2DA',[['greek5',240],['milk',140],['sugar',70],['vanilla',1.5]],[['jam',2.5,'blueberry, swirl'],['graham',2,'broken']],{...FRO,gone:1}),
+ BJ('greek-banana-peanut-butter','Banana Peanut Butter Greek','Banana Peanut Butter Greek','#EEDDA6',[['banana',1,'very ripe'],['greek5',200],['milk',80],['sugar',45]],[['pb',2.5,'swirl']],{...FRO,gone:1}),
+ BJ('greek-liz-lemon','Lemon Blueberry Lavender Greek','Liz Lemon Greek','#F4F0C8',[['greek5',240],['milk',120],['lemonml',30],['sugar',75],['zest',1]],[['jam',2.5,'blueberry, swirl']],{...FRO,gone:1}),
+ BJ('greek-vanilla-honey-caramel','Vanilla Honey Caramel Greek','Vanilla Honey Caramel Greek','#F3E6C6',[['greek5',240],['milk',140],['honey',3],['sugar',20],['vanilla',1.5]],[['caramel',2,'swirl']],{...FRO,gone:1}),
+ /* sorbets */
+ BJ('berried-treasure','Berried Treasure','Berried Treasure Sorbet','#9A2E5A',[['blue',120],['blackb',120],['water',110],['sugar',75],['lemonml',20]],[],{...SORB,gone:1}),
+ BJ('jamaican-me-crazy','Pineapple Passion Fruit','Jamaican Me Crazy Sorbet','#F6C846',[['pine',260],['passion',60],['water',60],['sugar',45],['lime',1]],[],{...SORB,gone:1}),
+ BJ('lemonade-sorbet','Lemonade','Lemonade Sorbet','#F6F0A8',[['lemonml',110],['water',270],['sugar',95],['zest',1]],[],{...SORB,gone:1}),
+ BJ('mango-lime-sorbet','Mango Lime','Mango Lime Sorbet','#F7B23A',[['mango',320],['water',70],['sugar',50],['lime',2]],[],{...SORB,gone:1}),
+ BJ('strawberry-kiwi-sorbet','Strawberry Kiwi','Strawberry Kiwi Sorbet','#E8667A',[['straw',200],['kiwi',120],['water',70],['sugar',65],['lemon',1]],[],{...SORB,gone:1}),
+ BJ('doonesberry-sorbet','Raspberry Blueberry','Doonesberry Sorbet','#8E2E66',[['rasp',150],['blue',130],['water',100],['sugar',75],['lemon',1]],[],{...SORB,gone:1}),
+ BJ('purple-passion-fruit','Purple Passion Fruit','Purple Passion Fruit Sorbet','#B0457A',[['passion',120],['rasp',80],['water',190],['sugar',75]],[],{...SORB,gone:1}),
+);
+{ const bo=[...new Set(R.map(r=>r.brand))]; R.sort((a,b)=>bo.indexOf(a.brand)-bo.indexOf(b.brand)); }
+
 /* sugar per 100 g (includes natural milk and fruit sugars; allulose and stevia count as 0) */
-const SUGAR={milk:4.8,milk15:4.8,ufmilk:2.5,cream:2.8,greek:3.6,greek5:4,greek2:4,skyr:4,cc:3,lcc:4,ccg:3,lccg:4,wheyV:4,wheyC:4,sugar:100,brown:97,honey:82,allulose:0,stevia:0,cocoa:1.8,vanilla:13,salt:0,espresso:0,mint:0,malt:50,pb:6,pb2:10,biscoff:38,nutella:57,dulce:50,caramel:60,sfcaramel:0,sfchoc:0,fudge:50,fluff:58,jam:55,banana:12,straw:4.9,rasp:4.4,blue:10,cherry:13,mango:14,pine:10,lemon:2.5,lime:1.7,water:0,cocomilk:2,lcoco:1,oat:3.3,almondm:0,lavender:0,spinach:0.4,cereal:9,butter:0,oats:1,oreo:38,chips:55,minichips:55,dark:24,white:59,dough:40,brownie:40,graham:25,pretzel:3,toffee:60,almond:4,pecan:4,walnut:2.6,pistachio:7.7,lotus:38,pbcup:47,bueno:41,candy:65,sprinkles:75,cake:35,cone:25,beans:45,crunchbar:48,hazelnut:4.3,wafer:45,vyssino:65,peach:8.4,mastic:0,cinnamon:0,instcoffee:0,cocooil:0,phyllo:2,condensed:54,chocmilk:10,oj:8.4,lemonml:2.5,zest:0,passion:11,mascarpone:3.5,savoiardi:40,espressoml:0,cola:10.6,orangesoda:9.8,lemonlime:9,icetea:4.6,watermelon:6.2,pinej:10,cococream:3.3,loukoumas:8,tahini:0.5,halva:48,kataifi:3,tsoureki:18,melomakarono:30,kourabies:30,mahlab:0,rosewater:0,clove:0,orangezest:0,vanilia:97,rice:0,sesame:0.3,pasteli:40,figs:48,petitbeurre:22,revani:35,karidopita:35,sponge:35,choux:5,coconut:7,blondie:38,shortbread:20,crisps:0.5,pumpkin:3.3,oatcookie:30,cookie:35,milkchoc:51,caprice:40,diples:25,sokolatopita:40,petimezi:70,loukoumi:70,lemonade:10,kumquat:9.4,mountaintea:0};
+const SUGAR={milk:4.8,milk15:4.8,ufmilk:2.5,cream:2.8,greek:3.6,greek5:4,greek2:4,skyr:4,cc:3,lcc:4,ccg:3,lccg:4,wheyV:4,wheyC:4,sugar:100,brown:97,honey:82,allulose:0,stevia:0,cocoa:1.8,vanilla:13,salt:0,espresso:0,mint:0,malt:50,pb:6,pb2:10,biscoff:38,nutella:57,dulce:50,caramel:60,sfcaramel:0,sfchoc:0,fudge:50,fluff:58,jam:55,banana:12,straw:4.9,rasp:4.4,blue:10,cherry:13,mango:14,pine:10,lemon:2.5,lime:1.7,water:0,cocomilk:2,lcoco:1,oat:3.3,almondm:0,lavender:0,spinach:0.4,cereal:9,butter:0,oats:1,oreo:38,chips:55,minichips:55,dark:24,white:59,dough:40,brownie:40,graham:25,pretzel:3,toffee:60,almond:4,pecan:4,walnut:2.6,pistachio:7.7,lotus:38,pbcup:47,bueno:41,candy:65,sprinkles:75,cake:35,cone:25,beans:45,crunchbar:48,hazelnut:4.3,wafer:45,vyssino:65,peach:8.4,mastic:0,cinnamon:0,instcoffee:0,cocooil:0,phyllo:2,condensed:54,chocmilk:10,oj:8.4,lemonml:2.5,zest:0,passion:11,mascarpone:3.5,savoiardi:40,espressoml:0,cola:10.6,orangesoda:9.8,lemonlime:9,icetea:4.6,watermelon:6.2,pinej:10,cococream:3.3,loukoumas:8,tahini:0.5,halva:48,kataifi:3,tsoureki:18,melomakarono:30,kourabies:30,mahlab:0,rosewater:0,clove:0,orangezest:0,vanilia:97,rice:0,sesame:0.3,pasteli:40,figs:48,petitbeurre:22,revani:35,karidopita:35,sponge:35,choux:5,coconut:7,blondie:38,peanut:4,macadamia:4.6,cashew:6,raisin:59,popcorn:53,maple:60,apple:10,plum:10,ginger:0,ricotta:0.3,sweetpotato:4.2,gingersnap:28,marzipan:45,kiwi:9,blackb:4.9,shortbread:20,crisps:0.5,pumpkin:3.3,oatcookie:30,cookie:35,milkchoc:51,caprice:40,diples:25,sokolatopita:40,petimezi:70,loukoumi:70,lemonade:10,kumquat:9.4,mountaintea:0};
 /* ---------- Helpers ---------- */
 const STYLE = {full:'Full cream',protein:'Protein',dairyfree:'Dairy-free',sorbet:'Sorbet'};
 const KIND = {icecream:'Ice cream & sorbet',gelato:'Gelato',froyo:'Frozen yogurt',milkshake:'Milkshakes',slushie:'Slushies',italian:'Italian ice',drink:'Frozen drinks'};
@@ -1127,7 +1271,7 @@ R.forEach(r=>{ r.kind=r.kind||(r.program==='Gelato'?'gelato':r.program==='Milk S
 
 /* ---------- Lean (cutting) version of every recipe ---------- */
 const BASE_ML=473;
-const HALVE=new Set(['shortbread','blondie','crisps','oatcookie','cookie','coconut','milkchoc','caprice','diples','sokolatopita','pasteli','karidopita','revani','sponge','choux','petitbeurre','loukoumas','halva','kataifi','tsoureki','melomakarono','kourabies','white','hazelnut','wafer','dark','chips','minichips','dough','brownie','pbcup','candy','toffee','cake','lotus','crunchbar','beans','walnut','pecan','almond','pistachio']);
+const HALVE=new Set(['peanut','macadamia','cashew','popcorn','gingersnap','marzipan','shortbread','blondie','crisps','oatcookie','cookie','coconut','milkchoc','caprice','diples','sokolatopita','pasteli','karidopita','revani','sponge','choux','petitbeurre','loukoumas','halva','kataifi','tsoureki','melomakarono','kourabies','white','hazelnut','wafer','dark','chips','minichips','dough','brownie','pbcup','candy','toffee','cake','lotus','crunchbar','beans','walnut','pecan','almond','pistachio']);
 const r2=x=>Math.round(x*2)/2;
 function leanOf(r){
   if(r.style==='protein'||r.style==='sorbet') return {...r,lean:true,leanSame:true};
@@ -1139,6 +1283,7 @@ function leanOf(r){
     if(k==='oat'){ rest.push(['almondm',q,n]); continue; }
     if(k==='cocomilk'||k==='cococream'){ rest.push(['lcoco',k==='cococream'?q*1.5:q,n]); continue; }
     if(k==='mascarpone'){ rest.push(['lccg',Math.round(q*0.7/5)*5]); hasCC=true; continue; }
+    if(k==='maple'){ rest.push(['maple',Math.min(q,1)]); if(q>1) allu+=(q-1)*20; continue; }
     if(k==='honey'){ rest.push(['honey',Math.min(q,1)]); if(q>1) allu+=(q-1)*21; continue; }
     if(k==='malt'){ rest.push(['malt',Math.min(q,1.5)]); continue; }
     if(k==='dulce'||k==='caramel'){ rest.push(['sfcaramel',q]); continue; }
@@ -1266,14 +1411,28 @@ function pantry(r){
   if(SWAPCACHE.has(key)) return SWAPCACHE.get(key);
   const sw=([k,q,n])=> k==='allulose'&&state.sweet==='stevia' ? ['stevia',Math.max(3,Math.round(q*5)),'taste and adjust; brands vary']
                     : k==='skyr'&&state.yog==='greek' ? ['greek',q,n] : [k,q,n];
-  const out={...r,base:r.base.map(sw),mix:r.mix.map(sw)};
+  const out={...r,base:r.base.map(sw),mix:r.mix.map(sw),_f:undefined};
   out.nut=nutrition(out); out.n=ingCount(out); out.stevia=out.base.some(x=>x[0]==='stevia');
   SWAPCACHE.set(key,out); return out;
 }
 function view(r){ return pantry(state.lean ? r.L : r); }
 const F = () => state.ml/BASE_ML;
+
+/* Search: a phrase must sit inside one field (name, brand, flavor, section, program or a single ingredient).
+   Only if nothing matches that way do we fall back to "every word appears somewhere". */
+function fieldsOf(v){ if(v._f) return v._f; const nm=x=>{const n=I[x[0]][0];return (Array.isArray(n)?n.join(' '):n).toLowerCase();};
+  return v._f=[v.name,v.brand,v.flavor,STYLE[v.style],KIND[v.kind]||'',v.program].map(x=>x.toLowerCase()).concat([...v.base,...v.mix].map(nm)); }
+let _sq=null,_smode='phrase',_skey='';
+function searchOK(r){
+  const q=state.q.replace(/\s+/g,' ').trim(); if(!q) return true;
+  const key=q+'|'+state.lean+state.sweet+state.yog;
+  if(key!==_skey){ _skey=key; _sq=q; _smode=R.some(x=>fieldsOf(view(x)).some(f=>f.includes(q)))?'phrase':'words'; }
+  const f=fieldsOf(view(r));
+  if(_smode==='phrase') return f.some(x=>x.includes(q));
+  const all=f.join(' | '); return q.split(' ').every(w=>all.includes(w));
+}
 function filtered(){
-  let list=R.filter(r=>(state.kind==='all'||r.kind===state.kind)&&(state.style==='all'||r.style===state.style)&&(state.brand==='all'||r.brand===state.brand)&&(!state.favOnly||favs.has(r.id))&&(!state.noCC||!view(r).cc)&&quickOK(r)&&(!state.q||state.q.split(/\s+/).every(w=>r.search.includes(w))));
+  let list=R.filter(r=>(state.kind==='all'||r.kind===state.kind)&&(state.style==='all'||r.style===state.style)&&(state.brand==='all'||r.brand===state.brand)&&(!state.favOnly||favs.has(r.id))&&(!state.noCC||!view(r).cc)&&quickOK(r)&&searchOK(r));
   const s=state.sort, N=r=>view(r).nut;
   if(s==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
   if(s==='protein') list.sort((a,b)=>N(b).p-N(a).p);
@@ -1493,6 +1652,7 @@ function tick(){
   if(sec<=0){ clearInterval(tmr.id); const box=document.getElementById('ckTimerBox'); if(box){ box.classList.add('done'); } if(el) el.textContent='Done'; if(chip) chip.textContent='⏱ Done'; beep(); tmr.done=true; }
 }
 function renderCook(focusSel){
+  const _ob=cookDlg.querySelector('.ck-body'), _st=_ob?_ob.scrollTop:0;
   const {r,pages,i}=ck, pg=pages[i], m=F();
   const total=pages.length;
   let body='';
@@ -1526,7 +1686,7 @@ function renderCook(focusSel){
       <button class="btn primary" type="button" data-next>${i===total-1?'Finish':i===0?'Start →':'Next →'}</button></div>`;
   if(tmr) tick();
   const fe=cookDlg.querySelector(focusSel||'[data-next]'); if(fe&&cookDlg.open) fe.focus({preventScroll:true});
-  const bd=cookDlg.querySelector('.ck-body'); if(bd&&(!focusSel||/next|prev/.test(focusSel))) bd.scrollTop=0;
+  const bd=cookDlg.querySelector('.ck-body'); if(bd) bd.scrollTop=(!focusSel||/next|prev/.test(focusSel))?0:_st;
 }
 cookDlg.addEventListener('click',e=>{
   if(!ck) return;
@@ -1534,7 +1694,7 @@ cookDlg.addEventListener('click',e=>{
   if(t.closest('[data-ckclose]')){ closeCook(); return; }
   if(t.closest('[data-prev]')){ if(ck.i>0){ ck.i--; renderCook(ck.i>0?'[data-prev]':'[data-next]'); } return; }
   if(t.closest('[data-next]')){ if(ck.i<ck.pages.length-1){ ck.i++; renderCook('[data-next]'); } else { stopTimer(); ck=null; lastCook=null; closeCook(); if(dlg.open&&cur) openRecipe(cur); } return; }
-  const c=t.closest('[data-ck]'); if(c){ const k=c.dataset.ck; ck.checked.has(k)?ck.checked.delete(k):ck.checked.add(k); renderCook(`[data-ck="${k}"]`); return; }
+  const c=t.closest('[data-ck]'); if(c){ const k=c.dataset.ck; const on=!ck.checked.has(k); on?ck.checked.add(k):ck.checked.delete(k); c.setAttribute('aria-checked',on); c.querySelector('.box').textContent=on?'✓':''; return; }
   const tm=t.closest('[data-timer]'); if(tm){ startTimer(+tm.dataset.timer); renderCook('[data-stop]'); return; }
   if(t.closest('[data-stop]')){ stopTimer(); renderCook('[data-timer]'); return; }
   if(t.closest('[data-jump-timer]')){ const j=ck.pages.findIndex(p=>p.type==='step'&&tmr&&new RegExp('\\b'+tmr.min+' minutes?').test(p.t)); if(j>=0){ ck.i=j; renderCook(); } return; }
