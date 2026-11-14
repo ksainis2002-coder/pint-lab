@@ -420,6 +420,7 @@ const I = {
   choux:['profiterole choux shells','g',1,360,9,26,22,'#D9A55E'],
   coconut:['toasted coconut flakes','g',1,660,6.9,65,24,'#F1E6CF'],
   blondie:['blondie','g',1,430,5,20,58,'#D9A85E'],
+  shortbread:[['shortbread cookie','shortbread cookies'],'',8,500,6,25,64,'#E8CF9A'],
   crisps:['salted potato chips','g',1,536,7,35,53,'#E8C25A'],
   pumpkin:['pumpkin purée','g',1,34,1,0.3,8],
   oatcookie:[['oatmeal cookie','oatmeal cookies'],'',15,450,6,18,68,'#B98A55'],
@@ -607,6 +608,87 @@ const R = [
   base:[['milk',230],['cream',160],['brown',30],['sugar',35],['vanilla',1],['salt',1]],mix:[['blondie',40,'cubed'],['caramel',3,'salted, poured into the well as a core'],['salt',1,'flaky, on the caramel']]},
  {id:'coffee-cookie-mudslide',name:'Coffee Cookie Mudslide',brand:"Ben & Jerry's",flavor:'Dublin Mudslide (alcohol-free)',style:'full',program:'Ice Cream',color:'#C8A483',
   base:[['milk',220],['cream',170],['sugar',65],['espresso',1],['vanilla',1.5],['salt',1]],mix:[['cookie',2,'broken'],['fudge',1.5,'swirl'],['espresso',0.5,'stirred into the fudge']],swirl:true},
+
+ {id:'bj-vanilla',name:'Classic Vanilla',brand:"Ben & Jerry's",flavor:'Vanilla',style:'full',program:'Ice Cream',color:'#F6ECD3',
+  base:[['milk',210],['cream',185],['sugar',70],['vanilla',2],['salt',1]],mix:[]},
+ {id:'bj-chocolate',name:'Classic Chocolate',brand:"Ben & Jerry's",flavor:'Chocolate',style:'full',program:'Ice Cream',color:'#5E3A2A',
+  base:CHOC(3),mix:[],prep:[BLOOM]},
+ {id:'bj-strawberry',name:'Classic Strawberry',brand:"Ben & Jerry's",flavor:'Strawberry',style:'full',program:'Ice Cream',color:'#F1B5BF',
+  base:[['straw',170,'blended'],['milk',130],['cream',140],['sugar',70],['lemon',0.5],['salt',1]],mix:[['straw',50,'diced']]},
+ {id:'salted-caramel-almond',name:'Salted Caramel Almond',brand:"Ben & Jerry's",flavor:'Salted Caramel Almond',style:'full',program:'Ice Cream',color:'#F1E3C4',
+  base:SW(60),mix:[['caramel',2.5,'salted, swirl'],['almond',25],['dark',15,'melted over the almonds']],swirl:true},
+ {id:'coffee-toffee-crunch',name:'Coffee Toffee Crunch',brand:"Ben & Jerry's",flavor:'Coffee Toffee Bar Crunch',style:'full',program:'Ice Cream',color:'#B88B67',
+  base:[['milk',220],['cream',170],['sugar',70],['espresso',2],['salt',1]],mix:[['toffee',25],['dark',20,'chunks']]},
+ {id:'vanilla-toffee-crunch',name:'Vanilla Toffee Crunch',brand:"Ben & Jerry's",flavor:'Vanilla Toffee Bar Crunch',style:'full',program:'Ice Cream',color:'#F3E7CA',
+  base:SW(65),mix:[['toffee',30],['dark',20,'chunks']]},
+ {id:'butter-pecan',name:'Butter Pecan',brand:"Ben & Jerry's",flavor:'Butter Pecan',style:'full',program:'Ice Cream',color:'#EFDDB6',
+  base:[['milk',220],['cream',170],['brown',45],['sugar',20],['vanilla',1],['salt',1]],mix:[['pecan',40,'toasted in the butter with a pinch of salt'],['butter',10]]},
+ {id:'mint-chocolate-chunk',name:'Mint Chocolate Chunk',brand:"Ben & Jerry's",flavor:'Mint Chocolate Chunk',style:'full',program:'Ice Cream',color:'#E6F0E4',
+  base:[['milk',220],['cream',170],['sugar',70],['mint',0.75],['salt',1]],mix:[['dark',45,'in big chunks']]},
+ {id:'brewed-to-matter',name:'Coffee Brownie Batter',brand:"Ben & Jerry's",flavor:'Brewed to Matter',style:'full',program:'Ice Cream',color:'#B08665',
+  base:[['milk',220],['cream',170],['sugar',65],['espresso',2],['salt',1]],mix:[['dark',20,'chunks'],['fudge',2,'swirl'],['brownie',25,'crumbled into the fudge']],swirl:true},
+ {id:'chillin-the-roast',name:'Cold Brew Cookie Swirl',brand:"Ben & Jerry's",flavor:"Chillin' the Roast",style:'full',program:'Ice Cream',color:'#A98161',
+  base:[['milk',160],['cream',170],['espressoml',70,'cold brew concentrate'],['sugar',70],['salt',1]],mix:[['oreo',3,'crushed to crumbs'],['minichips',20]]},
+ {id:'cold-brew-caramel-latte',name:'Cold Brew Caramel Latte',brand:"Ben & Jerry's",flavor:'Cold Brew Caramel Latte',style:'full',program:'Ice Cream',color:'#C9A27C',
+  base:[['milk',170],['cream',160],['espressoml',70,'cold brew concentrate'],['dulce',2],['sugar',45],['salt',1]],mix:[['caramel',2,'swirl'],['minichips',20]],swirl:true},
+ {id:'cookies-cream-cheesecake-core',name:'Cookies & Cream Cheesecake Core',brand:"Ben & Jerry's",flavor:'Cookies & Cream Cheesecake Core',style:'full',program:'Ice Cream',color:'#6A4534',
+  base:CHOC(2),mix:[['oreo',3,'crushed'],['ccg',45,'beaten with 2 tsp of the sugar, spooned into the well as a core']],prep:[BLOOM],
+  tip:'After MIX-IN with the cookies, make a fresh well, fill it with the sweetened cream cheese and don\'t spin again.'},
+ {id:'peanut-buttah-cookie-core',name:'Peanut Butter Cookie Core',brand:"Ben & Jerry's",flavor:'Peanut Buttah Cookie Core',style:'full',program:'Ice Cream',color:'#D8AE76',
+  base:[['milk',240],['cream',120],['pb',3],['sugar',60],['salt',1]],mix:[['cookie',2,'crushed'],['pbcup',3,'quartered'],['pb',2,'mixed with 1 crushed cookie, spooned in as a core']]},
+ {id:'cookie-dough-core',name:'Cookie Dough Core',brand:"Ben & Jerry's",flavor:'Chocolate Chip Cookie Dough Core',style:'full',program:'Ice Cream',color:'#EFE0C0',
+  base:[['milk',220],['cream',170],['sugar',40],['brown',30],['vanilla',1.5],['salt',1]],mix:[['minichips',20],['dough',70,'pressed into the well as a core']],
+  tip:'Run MIX-IN with the chips first, then press the dough into a fresh well down the middle.'},
+ {id:'minter-wonderland',name:'Minter Wonderland',brand:"Ben & Jerry's",flavor:'Minter Wonderland',style:'full',program:'Ice Cream',color:'#E9F2E8',
+  base:[['milk',220],['cream',170],['sugar',70],['mint',0.75],['salt',1]],mix:[['dark',35,'shaved into thin flakes']]},
+ {id:'chocolate-peppermint-crunch',name:'Chocolate Peppermint Crunch',brand:"Ben & Jerry's",flavor:'Chocolate Peppermint Crunch',style:'full',program:'Ice Cream',color:'#5C3829',
+  base:[['milk',260],['cream',140],['sugar',75],['cocoa',2.5],['mint',0.5],['salt',1]],mix:[['oreo',2,'crushed'],['toffee',15,'or crushed candy cane'],['fudge',1.5,'swirl']],swirl:true,prep:[BLOOM]},
+ {id:'marshmallow-moon',name:'Marshmallow Moon',brand:"Ben & Jerry's",flavor:'Marshmallow Moon',style:'full',program:'Ice Cream',color:'#F5ECDA',
+  base:SW(60),mix:[['fluff',3,'swirl'],['graham',2,'broken'],['dark',15,'chunks']],swirl:true},
+ {id:'baked-alaska',name:'Baked Alaska',brand:"Ben & Jerry's",flavor:'Baked Alaska',style:'full',program:'Ice Cream',color:'#F8F2E2',
+  base:SW(60),mix:[['fluff',3,'swirl'],['white',30,'chunks']],swirl:true},
+ {id:'glampfire-trail-mix',name:'Campfire Trail Mix',brand:"Ben & Jerry's",flavor:'Glampfire Trail Mix',style:'full',program:'Ice Cream',color:'#5E3B2B',
+  base:CHOC(2.5),mix:[['fluff',2,'swirl'],['pretzel',15,'broken'],['almond',15],['dark',15,'melted over the almonds']],swirl:true,prep:[BLOOM]},
+ {id:'pecan-pie',name:'Buttery Pecan Pie',brand:"Ben & Jerry's",flavor:'Bourbon Pecan Pie (alcohol-free)',style:'full',program:'Ice Cream',color:'#E8CFA0',
+  base:[['milk',220],['cream',170],['brown',55],['sugar',10],['vanilla',1.5],['salt',1]],mix:[['pecan',25,'toasted'],['shortbread',3,'broken'],['caramel',2,'swirl']],swirl:true},
+ {id:'wake-and-no-bake',name:'No-Bake Cookie Core',brand:"Ben & Jerry's",flavor:'Wake & No Bake',style:'full',program:'Ice Cream',color:'#EAD8B4',
+  base:SW(60),mix:[['dough',35,'peanut butter cookie dough if you can find it'],['minichips',15],['pb',1.5,'mixed with the oats and cocoa, spooned in as a core'],['oats',10],['cocoa',1]]},
+ {id:'ice-cream-sammie',name:'Ice Cream Sandwich',brand:"Ben & Jerry's",flavor:'Ice Cream Sammie',style:'full',program:'Ice Cream',color:'#EFEAE0',
+  base:SW(65),mix:[['oreo',5,'half crushed to crumbs, half in quarters']]},
+ {id:'chocolate-milk-and-cookies',name:'Chocolate Milk & Cookies',brand:"Ben & Jerry's",flavor:'Chocolate Milk & Cookies',style:'full',program:'Ice Cream',color:'#9C6E52',
+  base:[['chocmilk',250],['cream',140],['sugar',45],['cocoa',1],['salt',1]],mix:[['cookie',2,'broken'],['oreo',2,'crushed']]},
+ {id:'berry-sweet-mascarpone',name:'Berry Sweet Mascarpone',brand:"Ben & Jerry's",flavor:'Berry Sweet Mascarpone',style:'full',program:'Ice Cream',color:'#F5EAE6',
+  base:[['milk',240],['mascarpone',90],['cream',40],['sugar',65],['vanilla',1],['salt',1]],mix:[['jam',2.5,'mixed berry, swirl'],['shortbread',3,'broken']],swirl:true},
+ {id:'bananas-foster',name:'Bananas Foster',brand:"Ben & Jerry's",flavor:'Bananas Foster',style:'full',program:'Ice Cream',color:'#EDD9A0',
+  base:[['banana',1,'very ripe'],['milk',200],['cream',140],['brown',40],['cinnamon',0.5],['vanilla',1],['salt',1]],mix:[['caramel',2.5,'swirl'],['almond',15]],swirl:true},
+ {id:'peach-cobbler',name:'Peach Cobbler',brand:"Ben & Jerry's",flavor:'Peach Cobbler',style:'full',program:'Ice Cream',color:'#F6CFA0',
+  base:[['peach',170,'ripe, blended'],['milk',130],['cream',140],['sugar',65],['lemon',0.5],['salt',1]],mix:[['shortbread',3,'tossed with a pinch of cinnamon and sugar'],['peach',40,'diced']]},
+ {id:'rainforest-crunch',name:'Buttercrunch Vanilla',brand:"Ben & Jerry's",flavor:'Rainforest Crunch',style:'full',program:'Ice Cream',color:'#F4E9CD',
+  base:SW(65),mix:[['toffee',25],['almond',20,'or cashews, chopped']]},
+ {id:'wavy-gravy',name:'Caramel Nut Fudge',brand:"Ben & Jerry's",flavor:'Wavy Gravy',style:'full',program:'Ice Cream',color:'#D9B585',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',1]],mix:[['nutella',1.5,'swirl'],['almond',25,'roasted']],swirl:true},
+ {id:'truffle-kerfuffle',name:'Truffle Kerfuffle',brand:"Ben & Jerry's",flavor:'Truffle Kerfuffle',style:'full',program:'Ice Cream',color:'#F3E7CC',
+  base:SW(65),mix:[['pecan',20,'roasted'],['minichips',15],['fudge',2,'swirl'],['salt',1,'flaky, on the fudge']],swirl:true},
+ {id:'salted-caramel-brownie',name:'Salted Caramel Brownie',brand:"Ben & Jerry's",flavor:'Salted Caramel Brownie (Topped)',style:'full',program:'Ice Cream',color:'#F1E2C2',
+  base:SW(60),mix:[['brownie',40],['caramel',2,'salted, swirl'],['dark',25,'melted'],['cocooil',1,'melted with the chocolate, poured on top after mixing']],swirl:true,
+  tip:'For the "Topped" lid: smooth the surface after MIX-IN and pour the melted chocolate over it. It sets into a shell you crack with a spoon.'},
+ {id:'caramel-cookie-fix',name:'Caramel Cookie Fix',brand:"Ben & Jerry's",flavor:'Caramel Cookie Fix',style:'full',program:'Ice Cream',color:'#DCB988',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',1]],mix:[['biscoff',2,'swirl'],['lotus',3,'broken'],['minichips',15]],swirl:true},
+ {id:'save-our-swirled',name:'Raspberry Marshmallow Swirl',brand:"Ben & Jerry's",flavor:'Save Our Swirled',style:'full',program:'Ice Cream',color:'#EFB7C6',
+  base:[['milk',200],['cream',160],['rasp',80,'blended and strained'],['sugar',75],['salt',1]],mix:[['fluff',2,'swirl'],['jam',1.5,'raspberry, swirl'],['dark',15,'chunks'],['white',15,'chunks']],swirl:true},
+ {id:'home-sweet-honeycomb',name:'Home Sweet Honeycomb',brand:"Ben & Jerry's",flavor:'Home Sweet Honeycomb',style:'full',program:'Ice Cream',color:'#F0DCA8',
+  base:[['milk',220],['cream',170],['honey',2],['sugar',40],['vanilla',1],['salt',1]],mix:[['toffee',30,'or chocolate-covered honeycomb, chopped'],['caramel',1.5,'swirl']],swirl:true},
+ {id:'fairly-nuts',name:'Caramel Praline Almond',brand:"Ben & Jerry's",flavor:'Fairly Nuts',style:'full',program:'Ice Cream',color:'#DDBB8A',
+  base:[['milk',230],['cream',160],['dulce',3],['brown',30],['salt',1]],mix:[['almond',30,'caramelised'],['sugar',20,'for caramelising'],['caramel',1.5,'swirl']],swirl:true,
+  prep:['Caramelise the almonds: melt the 20 g sugar in a pan until amber, stir in the almonds, tip onto baking paper, cool and chop.']},
+ {id:'nd-caramel-almond-brittle',name:'Non-Dairy Caramel Almond Brittle',brand:"Ben & Jerry's",flavor:'Non-Dairy Caramel Almond Brittle',style:'dairyfree',program:'Ice Cream',color:'#E2C79C',
+  base:[['almondm',280],['cocomilk',130],['brown',45],['sugar',30],['vanilla',1],['salt',2]],mix:[['toffee',25,'dairy-free almond brittle'],['almond',15]],
+  tip:'Check the brittle label if you need it fully dairy-free; classic toffee contains butter.'},
+ {id:'nd-pb-and-cookies',name:'Non-Dairy PB & Cookies',brand:"Ben & Jerry's",flavor:'Non-Dairy P.B. & Cookies',style:'dairyfree',program:'Ice Cream',color:'#F0E6D2',
+  base:[['oat',290],['cocomilk',120],['sugar',70],['vanilla',1.5],['salt',1]],mix:[['oreo',4,'crushed'],['pb',2,'swirl']],swirl:true,
+  tip:'Chocolate sandwich cookies like Oreo are usually dairy-free, but check the pack.'},
+ {id:'nd-change-the-whirled',name:'Non-Dairy Caramel Graham Whirl',brand:"Ben & Jerry's",flavor:'Change the Whirled (non-dairy)',style:'dairyfree',program:'Ice Cream',color:'#DDBE94',
+  base:[['oat',290],['cocomilk',120],['brown',50],['sugar',25],['vanilla',1],['salt',2]],mix:[['minichips',15,'dairy-free'],['graham',2,'crushed'],['oreo',2,'crushed']]},
 
  /* Nirvana (Greece) */
  {id:'double-choc-chip',name:'Double Choc Chip',brand:'Nirvana',flavor:'Chocolate & Choco Chips',style:'full',program:'Ice Cream',color:'#5A3527',
@@ -1011,7 +1093,7 @@ const R = [
 ];
 
 /* sugar per 100 g (includes natural milk and fruit sugars; allulose and stevia count as 0) */
-const SUGAR={milk:4.8,milk15:4.8,ufmilk:2.5,cream:2.8,greek:3.6,greek5:4,greek2:4,skyr:4,cc:3,lcc:4,ccg:3,lccg:4,wheyV:4,wheyC:4,sugar:100,brown:97,honey:82,allulose:0,stevia:0,cocoa:1.8,vanilla:13,salt:0,espresso:0,mint:0,malt:50,pb:6,pb2:10,biscoff:38,nutella:57,dulce:50,caramel:60,sfcaramel:0,sfchoc:0,fudge:50,fluff:58,jam:55,banana:12,straw:4.9,rasp:4.4,blue:10,cherry:13,mango:14,pine:10,lemon:2.5,lime:1.7,water:0,cocomilk:2,lcoco:1,oat:3.3,almondm:0,lavender:0,spinach:0.4,cereal:9,butter:0,oats:1,oreo:38,chips:55,minichips:55,dark:24,white:59,dough:40,brownie:40,graham:25,pretzel:3,toffee:60,almond:4,pecan:4,walnut:2.6,pistachio:7.7,lotus:38,pbcup:47,bueno:41,candy:65,sprinkles:75,cake:35,cone:25,beans:45,crunchbar:48,hazelnut:4.3,wafer:45,vyssino:65,peach:8.4,mastic:0,cinnamon:0,instcoffee:0,cocooil:0,phyllo:2,condensed:54,chocmilk:10,oj:8.4,lemonml:2.5,zest:0,passion:11,mascarpone:3.5,savoiardi:40,espressoml:0,cola:10.6,orangesoda:9.8,lemonlime:9,icetea:4.6,watermelon:6.2,pinej:10,cococream:3.3,loukoumas:8,tahini:0.5,halva:48,kataifi:3,tsoureki:18,melomakarono:30,kourabies:30,mahlab:0,rosewater:0,clove:0,orangezest:0,vanilia:97,rice:0,sesame:0.3,pasteli:40,figs:48,petitbeurre:22,revani:35,karidopita:35,sponge:35,choux:5,coconut:7,blondie:38,crisps:0.5,pumpkin:3.3,oatcookie:30,cookie:35,milkchoc:51,caprice:40,diples:25,sokolatopita:40,petimezi:70,loukoumi:70,lemonade:10,kumquat:9.4,mountaintea:0};
+const SUGAR={milk:4.8,milk15:4.8,ufmilk:2.5,cream:2.8,greek:3.6,greek5:4,greek2:4,skyr:4,cc:3,lcc:4,ccg:3,lccg:4,wheyV:4,wheyC:4,sugar:100,brown:97,honey:82,allulose:0,stevia:0,cocoa:1.8,vanilla:13,salt:0,espresso:0,mint:0,malt:50,pb:6,pb2:10,biscoff:38,nutella:57,dulce:50,caramel:60,sfcaramel:0,sfchoc:0,fudge:50,fluff:58,jam:55,banana:12,straw:4.9,rasp:4.4,blue:10,cherry:13,mango:14,pine:10,lemon:2.5,lime:1.7,water:0,cocomilk:2,lcoco:1,oat:3.3,almondm:0,lavender:0,spinach:0.4,cereal:9,butter:0,oats:1,oreo:38,chips:55,minichips:55,dark:24,white:59,dough:40,brownie:40,graham:25,pretzel:3,toffee:60,almond:4,pecan:4,walnut:2.6,pistachio:7.7,lotus:38,pbcup:47,bueno:41,candy:65,sprinkles:75,cake:35,cone:25,beans:45,crunchbar:48,hazelnut:4.3,wafer:45,vyssino:65,peach:8.4,mastic:0,cinnamon:0,instcoffee:0,cocooil:0,phyllo:2,condensed:54,chocmilk:10,oj:8.4,lemonml:2.5,zest:0,passion:11,mascarpone:3.5,savoiardi:40,espressoml:0,cola:10.6,orangesoda:9.8,lemonlime:9,icetea:4.6,watermelon:6.2,pinej:10,cococream:3.3,loukoumas:8,tahini:0.5,halva:48,kataifi:3,tsoureki:18,melomakarono:30,kourabies:30,mahlab:0,rosewater:0,clove:0,orangezest:0,vanilia:97,rice:0,sesame:0.3,pasteli:40,figs:48,petitbeurre:22,revani:35,karidopita:35,sponge:35,choux:5,coconut:7,blondie:38,shortbread:20,crisps:0.5,pumpkin:3.3,oatcookie:30,cookie:35,milkchoc:51,caprice:40,diples:25,sokolatopita:40,petimezi:70,loukoumi:70,lemonade:10,kumquat:9.4,mountaintea:0};
 /* ---------- Helpers ---------- */
 const STYLE = {full:'Full cream',protein:'Protein',dairyfree:'Dairy-free',sorbet:'Sorbet'};
 const KIND = {icecream:'Ice cream & sorbet',gelato:'Gelato',froyo:'Frozen yogurt',milkshake:'Milkshakes',slushie:'Slushies',italian:'Italian ice',drink:'Frozen drinks'};
@@ -1045,7 +1127,7 @@ R.forEach(r=>{ r.kind=r.kind||(r.program==='Gelato'?'gelato':r.program==='Milk S
 
 /* ---------- Lean (cutting) version of every recipe ---------- */
 const BASE_ML=473;
-const HALVE=new Set(['blondie','crisps','oatcookie','cookie','coconut','milkchoc','caprice','diples','sokolatopita','pasteli','karidopita','revani','sponge','choux','petitbeurre','loukoumas','halva','kataifi','tsoureki','melomakarono','kourabies','white','hazelnut','wafer','dark','chips','minichips','dough','brownie','pbcup','candy','toffee','cake','lotus','crunchbar','beans','walnut','pecan','almond','pistachio']);
+const HALVE=new Set(['shortbread','blondie','crisps','oatcookie','cookie','coconut','milkchoc','caprice','diples','sokolatopita','pasteli','karidopita','revani','sponge','choux','petitbeurre','loukoumas','halva','kataifi','tsoureki','melomakarono','kourabies','white','hazelnut','wafer','dark','chips','minichips','dough','brownie','pbcup','candy','toffee','cake','lotus','crunchbar','beans','walnut','pecan','almond','pistachio']);
 const r2=x=>Math.round(x*2)/2;
 function leanOf(r){
   if(r.style==='protein'||r.style==='sorbet') return {...r,lean:true,leanSame:true};
